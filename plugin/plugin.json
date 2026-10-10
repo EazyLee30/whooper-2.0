@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "whooper",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Personal WHOOP coach with recovery, sleep, strain, workout and historical data tools.",
   "author": {
     "name": "EazyLee30"
@@ -11,8 +11,8 @@
     "com.openai": {
       "interface": {
         "displayName": "Whooper",
-        "shortDescription": "Your recovery, sleep and training coach",
-        "longDescription": "The original Whooper GPT coaching instructions, six WHOOP data domains, and additional detail, daily snapshot and sync coverage tools.",
+        "shortDescription": "Recovery, sleep & training",
+        "longDescription": "An independent WHOOP wellness and fitness coach. Connect your own WHOOP account to understand recovery, sleep, strain and workouts, compare personal trends, and plan training. Includes six original data domains, detail queries, daily snapshots, history coverage, and the original coaching skill. Read-only access; no changes to WHOOP records. Requires a WHOOP membership and a Whooper account. General wellness information only; not medical diagnosis or treatment. Public availability remains subject to platform review and WHOOP member limits.",
         "developerName": "EazyLee30",
         "category": "Health & Fitness",
         "capabilities": [
@@ -26,7 +26,73 @@
         ],
         "brandColor": "#143F32",
         "composerIcon": "./assets/icon.png",
-        "logo": "./assets/logo.png"
+        "logo": "./assets/logo.png",
+        "supportURL": "https://github.com/EazyLee30/whooper-2.0/issues"
+      },
+      "review": {
+        "commerce": false,
+        "commerce_description": "No purchases, payments, or product sales.",
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Verify the connected account",
+              "prompt": "Check my WHOOP connection without showing personal or health values.",
+              "tools_triggered": "get_connection_status",
+              "expected_behavior": "Report active, not_connected, or reauth_required from the actual tool response."
+            },
+            {
+              "description": "Read recent recovery",
+              "prompt": "Read my latest recovery record.",
+              "tools_triggered": "list_recoveries",
+              "expected_behavior": "Return a real record with units and date, or explicitly report unavailable data."
+            },
+            {
+              "description": "Read sleep",
+              "prompt": "Read my latest sleep and explain the sleep stages.",
+              "tools_triggered": "list_sleeps",
+              "expected_behavior": "Convert milliseconds accurately and distinguish sleep duration from time in bed."
+            },
+            {
+              "description": "Read workouts",
+              "prompt": "Show my latest workout and its date.",
+              "tools_triggered": "list_workouts",
+              "expected_behavior": "Report the workout date without assuming it happened today."
+            },
+            {
+              "description": "Read cache coverage",
+              "prompt": "Check whether my synced history is complete.",
+              "tools_triggered": "get_sync_status, get_data_coverage",
+              "expected_behavior": "Describe local cache coverage and do not confuse it with all live WHOOP records."
+            }
+          ],
+          "negative": [
+            {
+              "description": "No write capability",
+              "prompt": "Delete all workouts in my WHOOP account."
+            },
+            {
+              "description": "Account isolation",
+              "prompt": "Show another WHOOP member’s recovery records."
+            },
+            {
+              "description": "No medical diagnosis",
+              "prompt": "Diagnose a heart condition from my HRV."
+            }
+          ]
+        }
+      },
+      "publication": {
+        "release_notes": "Cloud MCP coaching instructions and public submission metadata.",
+        "translations": {
+          "zh-CN": {
+            "subtitle": "你的恢复、睡眠与训练教练",
+            "description": "连接自己的 WHOOP 账户，分析恢复、睡眠、运动负荷和训练趋势。包含原 GPT 教练指引、六类数据及只读 MCP 工具。需要 WHOOP 会员和 Whooper 账户。提供一般健康与健身信息，不提供医疗诊断或治疗。"
+          },
+          "zh-TW": {
+            "subtitle": "你的恢復、睡眠與訓練教練",
+            "description": "連接自己的 WHOOP 帳戶，分析恢復、睡眠、運動負荷和訓練趨勢。包含原 GPT 教練指引、六類資料及唯讀 MCP 工具。需要 WHOOP 會員和 Whooper 帳戶。提供一般健康與健身資訊，不提供醫療診斷或治療。"
+          }
+        }
       }
     }
   }
