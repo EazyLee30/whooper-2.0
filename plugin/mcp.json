@@ -1,0 +1,1 @@
+{"servers":{"whooper":{"note":"Replace with the deployed Vercel URL. OAuth via Clerk (PKCE S256).","url":"https://whooper.example.com/api/mcp"}}}

@@ -1,0 +1,133 @@
+// Whooper 2.0 — Prisma schema (per spec §4)
+// native_id / cycle_id stored as String to avoid JS number int64 precision loss.
+// All timestamps are timestamptz (DateTime). Raw WHOOP payloads kept in Json.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                String   @id @default(uuid())
+  clerkUserId       String   @unique @map("clerk_user_id")
+  preferredTimezone String   @default("Asia/Shanghai") @map("preferred_timezone")
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  connections WhoopConnection[]
+
+  @@map("users")
+}
+
+model WhoopConnection {
+  id               String    @id @default(uuid())
+  userId           String    @map("user_id")
+  whoopUserId      String    @map("whoop_user_id")
+  scopes           String[]  @default([])
+  status           String    @default("active") // active | reauth_required | revoked
+  accessCiphertext String    @map("access_ciphertext") @db.Text
+  refreshCiphertext String   @map("refresh_ciphertext") @db.Text
+  tokenExpiresAt   DateTime  @map("token_expires_at") @db.Timestamptz(6)
+  tokenVersion     Int       @default(1) @map("token_version")
+  lastRefreshAt    DateTime? @map("last_refresh_at") @db.Timestamptz(6)
+  updatedAt        DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  records WhoopRecord[]
+  syncJobs SyncJob[]
+
+  @@unique([userId, whoopUserId])
+  @@map("whoop_connections")
+}
+
+model WhoopRecord {
+  id              String    @id @default(uuid())
+  connectionId    String    @map("connection_id")
+  kind            String    // cycle | recovery | sleep | workout
+  nativeId        String    @map("native_id") // WHOOP v2 id as string (int64-safe)
+  v1Id            String?   @map("v1_id")
+  cycleId         String?   @map("cycle_id")
+  sleepId         String?   @map("sleep_id")
+  startedAt       DateTime? @map("started_at") @db.Timestamptz(6)
+  endedAt         DateTime? @map("ended_at") @db.Timestamptz(6)
+  timezoneOffset  Int?      @map("timezone_offset")
+  scoreState      String?   @map("score_state") // SCORED | PENDING_SCORE | ...
+  sourceCreatedAt DateTime? @map("source_created_at") @db.Timestamptz(6)
+  sourceUpdatedAt DateTime? @map("source_updated_at") @db.Timestamptz(6)
+  payload         Json      @map("payload_jsonb")
+  deletedAt       DateTime? @map("deleted_at") @db.Timestamptz(6)
+  syncedAt        DateTime  @default(now()) @map("synced_at") @db.Timestamptz(6)
+
+  connection WhoopConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+
+  @@unique([connectionId, kind, nativeId])
+  @@index([connectionId, kind, startedAt])
+  @@map("whoop_records")
+}
+
+model SyncJob {
+  id              String    @id @default(uuid())
+  connectionId    String    @map("connection_id")
+  kind            String    // cycle | recovery | sleep | workout
+  mode            String    // backfill | reconcile | webhook
+  startAt         DateTime? @map("start_at") @db.Timestamptz(6)
+  endAt           DateTime? @map("end_at") @db.Timestamptz(6)
+  nextToken       String?   @map("next_token") @db.Text
+  status          String    @default("running") // running | done | error
+  pagesDone       Int       @default(0) @map("pages_done")
+  itemsUpserted   Int       @default(0) @map("items_upserted")
+  lastErrorRedacted String? @map("last_error_redacted") @db.Text
+  startedAt       DateTime  @default(now()) @map("started_at") @db.Timestamptz(6)
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  finishedAt      DateTime? @map("finished_at") @db.Timestamptz(6)
+
+  connection WhoopConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+
+  @@map("sync_jobs")
+}
+
+model WebhookEvent {
+  id           String    @id @default(uuid())
+  traceId      String    @unique @map("trace_id")
+  whoopUserId  String?   @map("whoop_user_id")
+  resourceId   String?   @map("resource_id")
+  eventType    String    @map("event_type")
+  payload      Json      @map("payload_jsonb")
+  receivedAt   DateTime  @default(now()) @map("received_at") @db.Timestamptz(6)
+  processedAt  DateTime? @map("processed_at") @db.Timestamptz(6)
+  lastError    String?   @map("last_error") @db.Text
+
+  @@map("webhook_events")
+}
+
+model DailyMetric {
+  connectionId        String   @map("connection_id")
+  localDate           DateTime @map("local_date") @db.Date
+  cycleId             String?  @map("cycle_id")
+  recoveryScore       Int?     @map("recovery_score")
+  hrvRmssdMs          Float?   @map("hrv_rmssd_ms")
+  restingHrBpm        Float?   @map("resting_hr_bpm")
+  sleepHours          Float?   @map("sleep_hours")
+  sleepPerformancePct Float?   @map("sleep_performance_pct")
+  strain              Float?
+  steps               Int?
+  flags               Json?    @map("flags_jsonb")
+  computedAt          DateTime @default(now()) @map("computed_at") @db.Timestamptz(6)
+
+  @@id([connectionId, localDate])
+  @@map("daily_metrics")
+}
+
+model AuditEvent {
+  id           String   @id @default(uuid())
+  connectionId String?  @map("connection_id")
+  action       String
+  requestId    String?  @map("request_id")
+  status       String
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("audit_events")
+}
