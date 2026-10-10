@@ -4,7 +4,14 @@
 import { createMcpHandler, withMcpAuth } from 'mcp-handler';
 import { verifyClerkMcpToken } from '@/lib/auth/clerk';
 import { registerReadTools } from '@/mcp/tools/read';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
+// Cloud clients receive the same coaching guidance as the portable skill.
+const coachingInstructions = readFileSync(
+  join(process.cwd(), 'plugin/skills/whooper/SKILL.md'),
+  'utf8',
+).replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, '').trim();
 
 export const maxDuration = 120;
 
@@ -15,6 +22,7 @@ const handler = createMcpHandler(
   },
   {
     serverInfo: { name: 'whooper', version: '0.2.0' },
+    instructions: coachingInstructions,
   },
 );
 
