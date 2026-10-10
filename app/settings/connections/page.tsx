@@ -14,9 +14,9 @@ export default async function ConnectionsPage({
 
   const user = await prisma.user.findUnique({
     where: { clerkUserId: userId },
-    include: { whoopConnections: true },
+    include: { connections: true },
   });
-  const conn = user?.whoopConnections?.[0];
+  const conn = user?.connections?.[0];
 
   return (
     <main style={{ maxWidth: 640, margin: '0 auto', padding: '48px 24px', fontFamily: 'system-ui' }}>
