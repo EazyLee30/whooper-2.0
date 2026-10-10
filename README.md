@@ -1,8 +1,8 @@
 <p align="center"><img src="docs/assets/banner.png" alt="Whooper — Know your rhythm." width="100%"></p>
 <p align="center">
-<a href="https://whooper-peach.vercel.app"><img src="https://img.shields.io/badge/Public_trial-Visit-143F32?style=flat-square" alt="Public trial"></a>
+<a href="https://whooper.ccwu.cc"><img src="https://img.shields.io/badge/Public_trial-Visit-143F32?style=flat-square" alt="Public trial"></a>
 <a href="https://github.com/EazyLee30/whooper-2.0/actions/workflows/checks.yml"><img src="https://github.com/EazyLee30/whooper-2.0/actions/workflows/checks.yml/badge.svg" alt="Checks"></a>
-<img src="https://img.shields.io/badge/Plugin-v0.2.0-8EDDA8?style=flat-square" alt="Plugin v0.2.0">
+<img src="https://img.shields.io/badge/Plugin-v0.2.1-8EDDA8?style=flat-square" alt="Plugin v0.2.1">
 <img src="https://img.shields.io/badge/WHOOP_API-v2-143F32?style=flat-square" alt="WHOOP API v2">
 <img src="https://img.shields.io/badge/MCP-Streamable_HTTP-FF735D?style=flat-square" alt="MCP Streamable HTTP">
 </p>
@@ -14,7 +14,7 @@ Your personal recovery, sleep and training coach — now a plugin for ChatGPT an
 
 Whooper carries forward the original GPT's coaching instructions and all six WHOOP data domains. The plugin combines a coaching skill with authenticated, read-only MCP tools. Each person signs in and connects their own WHOOP account.
 
-**[Open the public trial](https://whooper-peach.vercel.app)** · [Download plugin](https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.2.0) · [Plugin source](plugin) · [Privacy](https://whooper-peach.vercel.app/privacy)
+**[Open the public trial](https://whooper.ccwu.cc)** · [Download plugin](https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.2.1) · [Plugin source](plugin) · [Privacy](https://whooper.ccwu.cc/privacy)
 
 ## What you can do
 
@@ -36,7 +36,7 @@ Ask: “Compare my recovery and sleep over the last seven days.” Or: “Given 
 3. Install the package in a client that supports portable plugins. The package lives in `plugin/`; it contains `plugin.json`, `mcp.json`, the coaching skill and brand assets.
 4. Authorize the plugin with the same Whooper account. Ask it to check your connection before requesting health data.
 
-The MCP endpoint is `https://whooper-peach.vercel.app/api/mcp`. Adding that endpoint alone provides tools; install the complete plugin to include the original coaching instructions too.
+The MCP endpoint is `https://whooper.ccwu.cc/api/mcp`. Adding that endpoint alone provides tools; install the complete plugin to include the original coaching instructions too.
 
 **Trial status:** this deployment uses a Clerk development instance. The WHOOP app is currently Sandbox: up to 10 connected members (1 connected when checked on October 10, 2026). Public source and a downloadable package do not mean approval or listing in the universal plugin directory. Real-account acceptance testing and directory submission are tracked separately.
 

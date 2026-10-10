@@ -3,7 +3,7 @@
   "mcpServers": {
     "whooper": {
       "type": "streamable-http",
-      "url": "https://whooper-peach.vercel.app/api/mcp",
+      "url": "https://whooper.ccwu.cc/api/mcp",
       "extensions": {
         "com.openai": {
           "auth": {

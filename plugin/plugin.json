@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "whooper",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Personal WHOOP coach with recovery, sleep, strain, workout and historical data tools.",
   "author": {
     "name": "EazyLee30"
@@ -18,8 +18,8 @@
         "capabilities": [
           "Read"
         ],
-        "websiteURL": "https://whooper-peach.vercel.app",
-        "privacyPolicyURL": "https://whooper-peach.vercel.app/privacy",
+        "websiteURL": "https://whooper.ccwu.cc",
+        "privacyPolicyURL": "https://whooper.ccwu.cc/privacy",
         "defaultPrompt": [
           "Analyze my recovery and sleep over the last seven days",
           "Plan my training based on today’s readiness"

@@ -371,13 +371,13 @@ export default function Landing() {
             ))}
           </div>
           <div className="endpoint">
-            <code>https://whooper-peach.vercel.app/api/mcp</code>
+            <code>https://whooper.ccwu.cc/api/mcp</code>
             <button
               className="copy-btn"
               onClick={async () => {
                 try {
                   await navigator.clipboard.writeText(
-                    "https://whooper-peach.vercel.app/api/mcp",
+                    "https://whooper.ccwu.cc/api/mcp",
                   );
                   setCopied(true);
                 } catch {
@@ -443,7 +443,7 @@ export default function Landing() {
           </Link>
           <a
             className="text-link"
-            href="https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.2.0"
+            href="https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.2.1"
           >
             {t.package}
             <ArrowUpRight size={16} />

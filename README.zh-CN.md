@@ -1,8 +1,8 @@
 <p align="center"><img src="docs/assets/banner.png" alt="Whooper — Know your rhythm." width="100%"></p>
 <p align="center">
-<a href="https://whooper-peach.vercel.app"><img src="https://img.shields.io/badge/Public_trial-Visit-143F32?style=flat-square" alt="Public trial"></a>
+<a href="https://whooper.ccwu.cc"><img src="https://img.shields.io/badge/Public_trial-Visit-143F32?style=flat-square" alt="Public trial"></a>
 <a href="https://github.com/EazyLee30/whooper-2.0/actions/workflows/checks.yml"><img src="https://github.com/EazyLee30/whooper-2.0/actions/workflows/checks.yml/badge.svg" alt="Checks"></a>
-<img src="https://img.shields.io/badge/Plugin-v0.2.0-8EDDA8?style=flat-square" alt="Plugin v0.2.0">
+<img src="https://img.shields.io/badge/Plugin-v0.2.1-8EDDA8?style=flat-square" alt="Plugin v0.2.1">
 <img src="https://img.shields.io/badge/WHOOP_API-v2-143F32?style=flat-square" alt="WHOOP API v2">
 <img src="https://img.shields.io/badge/MCP-Streamable_HTTP-FF735D?style=flat-square" alt="MCP Streamable HTTP">
 </p>
@@ -14,7 +14,7 @@
 
 保留原 GPT 的完整教练指令和六类 WHOOP 数据功能，结合只读 MCP 工具、详情查询、每日快照与历史覆盖检查。每位用户登录自己的账号并授权自己的 WHOOP。
 
-**[公开试用](https://whooper-peach.vercel.app)** · [下载插件安装包](https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.2.0) · [插件源码](plugin) · [隐私说明](https://whooper-peach.vercel.app/privacy)
+**[公开试用](https://whooper.ccwu.cc)** · [下载插件安装包](https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.2.1) · [插件源码](plugin) · [隐私说明](https://whooper.ccwu.cc/privacy)
 
 ## 功能
 
@@ -36,7 +36,7 @@
 3. 在支持 portable plugin 的客户端安装 `plugin/` 中的完整插件包。
 4. 用同一 Whooper 账号授权插件，先检查连接，再查询数据。
 
-MCP 地址：`https://whooper-peach.vercel.app/api/mcp`。只添加 MCP 地址会提供工具；安装完整插件才能同时带上原 GPT 的教练指令。
+MCP 地址：`https://whooper.ccwu.cc/api/mcp`。只添加 MCP 地址会提供工具；安装完整插件才能同时带上原 GPT 的教练指令。
 
 **试用状态：**目前使用 Clerk 开发实例；WHOOP 应用目前为 Sandbox，最多连接 10 人（2026-10-10 检查时已连接 1 人）。源码公开和提供安装包不等于已通过通用插件目录审核。真实账号验收与目录提交分别进行。
 

@@ -3,17 +3,17 @@
 Checked on October 10, 2026.
 
 - Public repository: https://github.com/EazyLee30/whooper-2.0
-- Public trial: https://whooper-peach.vercel.app
-- Package: https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.2.0
+- Public trial: https://whooper.ccwu.cc
+- Package: https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.2.1
 - Six original WHOOP data domains and original coaching instructions included.
 - Fourteen authenticated read tools; tokens stay server-side.
 - Clerk public OAuth client requires PKCE; MCP tokens must belong to that client.
 - WHOOP callback and deployment configuration use the public trial URL.
 - WHOOP app currently Sandbox, 1 of 10 members connected.
 - Clerk is currently a development instance.
-- WHOOP webhooks are implemented but dashboard registration awaits authorization.
-- Real WHOOP account / ChatGPT OAuth acceptance test awaits authorization.
-- Universal plugin directory publication requires a separate submission and review.
+- WHOOP V2 webhook is registered at the canonical domain.
+- User authorized real-account acceptance testing. WHOOP consent currently encounters a provider-side 400 (header/cookie too large); clearing WHOOP site cookies and restarting OAuth remains pending.
+- Personal ChatGPT cloud plugin imported successfully. Authenticated tool acceptance testing and universal plugin directory submission/review remain pending.
 
 ## Self-hosting
 
