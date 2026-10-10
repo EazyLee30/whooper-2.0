@@ -1,0 +1,20 @@
+{
+  "name": "whooper-local",
+  "interface": {
+    "displayName": "Whooper"
+  },
+  "plugins": [
+    {
+      "name": "whooper",
+      "source": {
+        "source": "local",
+        "path": "./plugin"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Health & Fitness"
+    }
+  ]
+}

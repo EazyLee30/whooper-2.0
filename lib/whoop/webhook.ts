@@ -13,7 +13,7 @@ export function verifyWebhookSignature(opts: {
   secret: string;
 }): boolean {
   const { rawBody, timestampHeader, signatureHeader, secret } = opts;
-  if (!timestampHeader || !signatureHeader) return false;
+  if (!secret || !timestampHeader || !signatureHeader) return false;
   const ts = Number(timestampHeader);
   if (!Number.isFinite(ts)) return false;
   // WHOOP sends the timestamp header in milliseconds (tolerate seconds too).

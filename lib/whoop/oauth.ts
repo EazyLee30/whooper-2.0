@@ -48,10 +48,11 @@ async function tokenRequest(body: Record<string, string>): Promise<TokenSet> {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams(body),
+    signal: AbortSignal.timeout(15000),
+    cache: 'no-store',
   });
   if (!res.ok) {
-    const text = await res.text().catch(() => '');
-    throw new Error(`WHOOP token request failed: ${res.status} ${text.slice(0, 200)}`);
+    throw new WhoopTokenError(res.status);
   }
   const j = (await res.json()) as {
     access_token: string;
@@ -69,6 +70,10 @@ async function tokenRequest(body: Record<string, string>): Promise<TokenSet> {
     expiresIn: j.expires_in,
     scope: j.scope ?? '',
   };
+}
+
+export class WhoopTokenError extends Error {
+  constructor(public status: number) { super(`WHOOP token request failed (${status})`); }
 }
 
 export function exchangeCode(opts: {

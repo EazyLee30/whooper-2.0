@@ -1,1 +1,25 @@
-{"servers":{"whooper":{"note":"Replace with the deployed Vercel URL. OAuth via Clerk (PKCE S256).","url":"https://whooper.example.com/api/mcp"}}}
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "whooper": {
+      "type": "streamable-http",
+      "url": "https://whooper-peach.vercel.app/api/mcp",
+      "extensions": {
+        "com.openai": {
+          "auth": {
+            "type": "oauth",
+            "client": {
+              "mode": "provided",
+              "clientId": "EsrIyDTsryA3lxTL",
+              "tokenEndpointAuthMethod": "none"
+            },
+            "baseScopes": [
+              "openid",
+              "offline_access"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

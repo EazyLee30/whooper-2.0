@@ -5,7 +5,9 @@ import { z } from 'zod';
 import type { McpServer, AuthInfo, ServerContext } from '@modelcontextprotocol/server';
 import { prisma } from '@/lib/db';
 import { clerkSub } from '@/lib/auth/clerk';
-import { whoopGet } from '@/lib/whoop/client';
+import { whoopGet, COLLECTION_ENDPOINT, type Collection, type WhoopPage, WhoopApiError } from '@/lib/whoop/client';
+import { localDayBounds, normalizeDate, snapshotForDay, type WhoopRecordPayload } from '@/lib/whoop/records';
+import { DateTime } from 'luxon';
 
 const dateSchema = z.string().describe('ISO 8601 datetime or local YYYY-MM-DD');
 
@@ -42,59 +44,34 @@ async function getConnectionFor(sub: string) {
 const paginationInput = {
   from: dateSchema.optional(),
   to: dateSchema.optional(),
-  limit: z.number().int().min(1).max(100).default(25),
+  limit: z.number().int().min(1).max(25).default(25),
   cursor: z.string().optional().describe('opaque cursor from a previous call'),
 };
 
-function decodeCursor(cursor?: string): number {
-  if (!cursor) return 0;
-  try {
-    return Number(Buffer.from(cursor, 'base64url').toString('utf8')) || 0;
-  } catch {
-    return 0;
-  }
-}
-
-function encodeCursor(offset: number): string {
-  return Buffer.from(String(offset), 'utf8').toString('base64url');
-}
-
-async function listRecords(
-  connectionId: string,
-  kind: string,
-  args: { from?: string; to?: string; limit: number; cursor?: string },
-) {
-  const offset = decodeCursor(args.cursor);
-  const where: Record<string, unknown> = {
-    connectionId,
-    kind,
-    deletedAt: null,
-  };
-  if (args.from || args.to) {
-    where.startedAt = {
-      ...(args.from ? { gte: new Date(args.from) } : {}),
-      ...(args.to ? { lt: new Date(args.to) } : {}),
-    };
-  }
-  const rows = await prisma.whoopRecord.findMany({
-    where,
-    orderBy: { startedAt: 'desc' },
-    skip: offset,
-    take: args.limit + 1,
+async function listRecords(connectionId: string, kind: Collection, args: { from?: string; to?: string; limit: number; cursor?: string }, timezone: string) {
+  const from = normalizeDate(args.from, timezone);
+  const to = normalizeDate(args.to, timezone);
+  if (from && to && from >= to) throw new Error('from must be earlier than to (exclusive)');
+  const page = await whoopGet<WhoopPage>(connectionId, COLLECTION_ENDPOINT[kind], {
+    limit: String(args.limit), ...(from ? { start: from } : {}), ...(to ? { end: to } : {}),
+    ...(args.cursor ? { nextToken: args.cursor } : {}),
   });
-  const hasMore = rows.length > args.limit;
-  const page = rows.slice(0, args.limit);
-  return {
-    items: page.map((r) => ({
-      id: r.nativeId,
-      kind: r.kind,
-      started_at: r.startedAt,
-      ended_at: r.endedAt,
-      score_state: r.scoreState,
-      payload: r.payload,
-    })),
-    nextCursor: hasMore ? encodeCursor(offset + args.limit) : undefined,
-  };
+  return { items: page.records ?? [], nextCursor: page.next_token || null };
+}
+
+async function allInRange(connectionId: string, kind: Collection, start: string, end: string) {
+  const records: WhoopRecordPayload[] = [];
+  let cursor: string | undefined;
+  const seen = new Set<string>();
+  do {
+    const page = await whoopGet<WhoopPage>(connectionId, COLLECTION_ENDPOINT[kind], { start, end, limit: '25', ...(cursor ? { nextToken: cursor } : {}) });
+    records.push(...(page.records ?? []));
+    cursor = page.next_token || undefined;
+    if (cursor && seen.has(cursor)) throw new Error('WHOOP pagination cursor repeated');
+    if (cursor) seen.add(cursor);
+    if (seen.size > 100) throw new Error('daily snapshot exceeds pagination limit');
+  } while (cursor);
+  return records;
 }
 
 export function registerReadTools(server: McpServer) {
@@ -105,17 +82,13 @@ export function registerReadTools(server: McpServer) {
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     },
     async (ctx: ServerContext) => {
-      const { user, conn } = await getConnectionFor(clerkSub(authOf(ctx)));
-      const result = envelope(
-        {
-          status: conn.status,
-          scopes: conn.scopes,
-          token_expires_at: conn.tokenExpiresAt,
-          last_refresh_at: conn.lastRefreshAt,
-          whoop_user_id: conn.whoopUserId,
-        },
-        { timezone: user.preferredTimezone, cached: true },
-      );
+      const sub = clerkSub(authOf(ctx));
+      const user = await prisma.user.findUnique({ where: { clerkUserId: sub } });
+      const conn = user ? await prisma.whoopConnection.findFirst({ where: { userId: user.id }, orderBy: { updatedAt: 'desc' } }) : null;
+      const result = envelope({ status: conn?.status ?? 'not_connected', scopes: conn?.scopes ?? [],
+        token_expires_at: conn?.tokenExpiresAt, last_refresh_at: conn?.lastRefreshAt,
+        connect_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings/connections`,
+      }, { timezone: user?.preferredTimezone ?? 'Asia/Shanghai', cached: true });
       return { content: [{ type: 'text', text: JSON.stringify(result) }], structuredContent: result };
     },
   );
@@ -186,25 +159,29 @@ export function registerReadTools(server: McpServer) {
     },
     async (args, ctx) => {
       const { user, conn } = await getConnectionFor(clerkSub(authOf(ctx)));
-      const day = args.date ?? new Date().toISOString().slice(0, 10);
-      const metric = await prisma.dailyMetric.findUnique({
-        where: { connectionId_localDate: { connectionId: conn.id, localDate: new Date(day) } },
-      });
-      const start = new Date(`${day}T00:00:00Z`);
-      const end = new Date(`${day}T23:59:59.999Z`);
-      const records = await prisma.whoopRecord.findMany({
-        where: { connectionId: conn.id, deletedAt: null, startedAt: { gte: start, lt: end } },
-        orderBy: { startedAt: 'asc' },
-      });
-      const result = envelope(
-        { date: day, daily_metric: metric, records: records.map((r) => ({ kind: r.kind, id: r.nativeId, payload: r.payload })) },
-        { timezone: user.preferredTimezone, cached: true },
-      );
+      const day = args.date ?? DateTime.now().setZone(user.preferredTimezone).toISODate()!;
+      const bounds = localDayBounds(day, user.preferredTimezone);
+      // Sleep ending today can start yesterday; recovery can be scored later.
+      const start = DateTime.fromISO(bounds.start).minus({ days: 2 }).toISO()!;
+      const end = DateTime.fromISO(bounds.end).plus({ days: 1 }).toISO()!;
+      const cycles = await allInRange(conn.id, 'cycle', start, end);
+      const sleeps = await allInRange(conn.id, 'sleep', start, end);
+      const recoveries = await allInRange(conn.id, 'recovery', start, end);
+      const workouts = await allInRange(conn.id, 'workout', bounds.start, bounds.end);
+      const snapshot = snapshotForDay(day, user.preferredTimezone, cycles, sleeps, recoveries, workouts);
+      // Resolve recovery by cycle ID even if its scoring timestamp falls outside the window.
+      const recoveryIds = new Set(snapshot.recoveries.map(r => String(r.cycle_id)));
+      for (const cycle of snapshot.cycles) {
+        if (recoveryIds.has(String(cycle.id))) continue;
+        try { snapshot.recoveries.push(await whoopGet<WhoopRecordPayload>(conn.id, `/v2/cycle/${cycle.id}/recovery`)); }
+        catch (error) { if (!(error instanceof WhoopApiError && error.status === 404)) throw error; }
+      }
+      const result = envelope(snapshot, { timezone: user.preferredTimezone, cached: false });
       return { content: [{ type: 'text', text: JSON.stringify(result) }], structuredContent: result };
     },
   );
 
-  const listDefs: Array<{ name: string; kind: string; description: string }> = [
+  const listDefs: Array<{ name: string; kind: Collection; description: string }> = [
     { name: 'list_cycles', kind: 'cycle', description: 'Historical physiological cycles.' },
     { name: 'list_recoveries', kind: 'recovery', description: 'Recovery history.' },
     { name: 'list_sleeps', kind: 'sleep', description: 'Sleep history including naps.' },
@@ -220,8 +197,8 @@ export function registerReadTools(server: McpServer) {
       },
       async (args, ctx) => {
         const { user, conn } = await getConnectionFor(clerkSub(authOf(ctx)));
-        const page = await listRecords(conn.id, def.kind, args);
-        const result = envelope(page, { timezone: user.preferredTimezone, cached: true });
+        const page = await listRecords(conn.id, def.kind, args, user.preferredTimezone);
+        const result = envelope(page, { timezone: user.preferredTimezone, cached: false });
         return { content: [{ type: 'text', text: JSON.stringify(result) }], structuredContent: result };
       },
     );
@@ -231,7 +208,7 @@ export function registerReadTools(server: McpServer) {
     'get_cycle',
     {
       description: 'Full API fields for one cycle.',
-      inputSchema: z.object({ cycle_id: z.string() }),
+      inputSchema: z.object({ cycle_id: z.string().regex(/^\d+$/) }),
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     },
     async (args, ctx) => {
@@ -246,7 +223,7 @@ export function registerReadTools(server: McpServer) {
     'get_recovery',
     {
       description: 'Recovery detail for one cycle.',
-      inputSchema: z.object({ cycle_id: z.string() }),
+      inputSchema: z.object({ cycle_id: z.string().regex(/^\d+$/) }),
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     },
     async (args, ctx) => {
@@ -302,7 +279,7 @@ export function registerReadTools(server: McpServer) {
           connectionId: conn.id,
           deletedAt: null,
           ...(args.from || args.to
-            ? { startedAt: { ...(args.from ? { gte: new Date(args.from) } : {}), ...(args.to ? { lt: new Date(args.to) } : {}) } }
+            ? { startedAt: { ...(args.from ? { gte: new Date(normalizeDate(args.from, user.preferredTimezone)!) } : {}), ...(args.to ? { lt: new Date(normalizeDate(args.to, user.preferredTimezone)!) } : {}) } }
             : {}),
         },
         _count: { id: true },

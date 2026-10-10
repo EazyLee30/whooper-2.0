@@ -1,1 +1,33 @@
-{"description":"Personal WHOOP coach: recovery, sleep, strain and workouts over MCP.","mcp":"./mcp.json","name":"whooper","skills":["./skills/whooper/SKILL.md"],"version":"0.1.0"}
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "whooper",
+  "version": "0.2.0",
+  "description": "Personal WHOOP coach with recovery, sleep, strain, workout and historical data tools.",
+  "author": {
+    "name": "EazyLee30"
+  },
+  "repository": "https://github.com/EazyLee30/whooper-2.0",
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Whooper",
+        "shortDescription": "Your recovery, sleep and training coach",
+        "longDescription": "The original Whooper GPT coaching instructions, six WHOOP data domains, and additional detail, daily snapshot and sync coverage tools.",
+        "developerName": "EazyLee30",
+        "category": "Health & Fitness",
+        "capabilities": [
+          "Read"
+        ],
+        "websiteURL": "https://whooper-peach.vercel.app",
+        "privacyPolicyURL": "https://whooper-peach.vercel.app/privacy",
+        "defaultPrompt": [
+          "Analyze my recovery and sleep over the last seven days",
+          "Plan my training based on today’s readiness"
+        ],
+        "brandColor": "#143F32",
+        "composerIcon": "./assets/icon.png",
+        "logo": "./assets/logo.png"
+      }
+    }
+  }
+}

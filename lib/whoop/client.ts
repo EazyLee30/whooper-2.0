@@ -16,6 +16,10 @@ export const COLLECTION_ENDPOINT: Record<Collection, string> = {
   workout: '/v2/activity/workout',
 };
 
+export class WhoopApiError extends Error {
+  constructor(public status: number) { super(`WHOOP API request failed (${status})`); }
+}
+
 const MAX_ATTEMPTS = 4;
 
 function sleep(ms: number): Promise<void> {
@@ -42,35 +46,37 @@ export async function whoopGet<T = unknown>(
 
     const res = await fetch(url.toString(), {
       headers: { Authorization: `Bearer ${token}` },
+      cache: 'no-store',
+      signal: AbortSignal.timeout(15000),
     });
 
     if (res.status === 401 && !retried401) {
       // Token may have expired between check and call; force one locked refresh.
       retried401 = true;
       const { refreshUnderLock } = await import('@/lib/whoop/refresh');
-      token = await refreshUnderLock(connectionId);
+      token = await refreshUnderLock(connectionId, token);
       continue;
     }
     if (res.status === 401 || res.status === 403) {
-      const text = await res.text().catch(() => '');
-      throw new Error(`WHOOP auth error ${res.status}: ${text.slice(0, 200)}`);
+      throw new WhoopApiError(res.status);
     }
     if (res.status === 429) {
       const retryAfter = res.headers.get('retry-after');
       const reset = res.headers.get('x-ratelimit-reset');
       let waitMs: number | undefined;
-      if (retryAfter) waitMs = Number(retryAfter) * 1000;
+      if (retryAfter) waitMs = /^\d+$/.test(retryAfter) ? Number(retryAfter) * 1000 : Math.max(0, Date.parse(retryAfter) - Date.now());
       else if (reset) waitMs = Math.max(0, Number(reset) * 1000 - Date.now());
-      await sleep(backoff(attempt, waitMs));
+      if (attempt === MAX_ATTEMPTS - 1 || (waitMs ?? 0) > 15000) throw new WhoopApiError(429);
+      await sleep(backoff(attempt, Number.isFinite(waitMs) ? waitMs : undefined));
       continue;
     }
     if (res.status >= 500) {
+      if (attempt === MAX_ATTEMPTS - 1) throw new WhoopApiError(res.status);
       await sleep(backoff(attempt));
       continue;
     }
     if (!res.ok) {
-      const text = await res.text().catch(() => '');
-      throw new Error(`WHOOP API error ${res.status}: ${text.slice(0, 200)}`);
+      throw new WhoopApiError(res.status);
     }
     return (await res.json()) as T;
   }

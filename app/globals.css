@@ -1,26 +1,14 @@
 @import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+:root { color-scheme: light; }
+body { margin: 0; background: #f5f6f2; color: #14271f; font-family: Arial, sans-serif; }
+a { color: inherit; }
+.shell { width: min(760px, 100%); margin: 0 auto; padding: 36px 24px 64px; }
+header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 72px; font-weight: 700; }
+h1 { font-size: clamp(36px, 7vw, 64px); line-height: 1.15; letter-spacing: -.04em; margin: 16px 0 24px; }
+h2 { font-size: 22px; margin-bottom: 16px; }
+p { line-height: 1.8; margin: 16px 0; }
+.eyebrow { color: #557465; }
+.card { background: #fff; padding: 28px; margin-top: 32px; border: 1px solid #dce5dd; border-radius: 18px; }
+.button, button { display: inline-block; background: #173c2d; color: #fff; padding: 13px 22px; border-radius: 9px; text-decoration: none; cursor: pointer; border: 0; }
+button:disabled { opacity: .6; cursor: wait; }
+li { line-height: 1.8; }

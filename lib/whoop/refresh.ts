@@ -5,7 +5,7 @@
 
 import { prisma } from '@/lib/db';
 import { decryptToken, encryptToken } from '@/lib/crypto/envelope';
-import { refreshTokenSet } from '@/lib/whoop/oauth';
+import { refreshTokenSet, WhoopTokenError } from '@/lib/whoop/oauth';
 
 const REFRESH_SKEW_MS = 5 * 60 * 1000; // refresh when < 5 min of life remains
 
@@ -25,15 +25,15 @@ export async function getAccessToken(connectionId: string): Promise<string> {
     where: { id: connectionId },
   });
   if (!conn) throw new Error('connection not found');
-  if (conn.status === 'revoked') throw new Error('WHOOP authorization revoked');
+  if (conn.status !== 'active') throw new Error('WHOOP reconnection required');
   if (conn.tokenExpiresAt.getTime() - Date.now() > REFRESH_SKEW_MS) {
     return decryptToken(conn.accessCiphertext);
   }
   return refreshUnderLock(connectionId);
 }
 
-export async function refreshUnderLock(connectionId: string): Promise<string> {
-  return prisma.$transaction(async (tx) => {
+export async function refreshUnderLock(connectionId: string, rejectedAccessToken?: string): Promise<string> {
+  const result = await prisma.$transaction(async (tx) => {
     // Raw SQL for SELECT ... FOR UPDATE (Prisma has no first-class API).
     const rows = (await tx.$queryRawUnsafe(
       'SELECT id, refresh_ciphertext, token_expires_at, token_version, status FROM whoop_connections WHERE id = $1 FOR UPDATE',
@@ -47,15 +47,14 @@ export async function refreshUnderLock(connectionId: string): Promise<string> {
     }>;
     const row = rows[0];
     if (!row) throw new Error('connection not found');
-    if (row.status === 'revoked') throw new Error('WHOOP authorization revoked');
+    if (row.status !== 'active') throw new Error('WHOOP reconnection required');
+
+    const current = await tx.whoopConnection.findUniqueOrThrow({ where: { id: connectionId } });
+    const accessToken = decryptToken(current.accessCiphertext);
 
     // Another request may have refreshed while we waited for the lock.
-    if (row.token_expires_at.getTime() - Date.now() > REFRESH_SKEW_MS) {
-      return decryptToken(
-        (
-          await tx.whoopConnection.findUniqueOrThrow({ where: { id: connectionId } })
-        ).accessCiphertext,
-      );
+    if (rejectedAccessToken ? accessToken !== rejectedAccessToken : row.token_expires_at.getTime() - Date.now() > REFRESH_SKEW_MS) {
+      return { token: accessToken };
     }
 
     const refreshToken = decryptToken(row.refresh_ciphertext);
@@ -69,11 +68,15 @@ export async function refreshUnderLock(connectionId: string): Promise<string> {
     } catch (err) {
       // Classify: do NOT blindly retry a possibly-succeeded refresh.
       // Mark reauth required so the user re-binds instead of looping.
-      await tx.whoopConnection.update({
+      // A timeout may have consumed the rotating token. Require reconnection in that case.
+      // Explicit 429/5xx responses can be retried on a later request.
+      const reauth = !(err instanceof WhoopTokenError) || err.status === 400 || err.status === 401;
+      if (reauth) await tx.whoopConnection.update({
         where: { id: connectionId, tokenVersion: row.token_version },
         data: { status: 'reauth_required', lastRefreshAt: new Date() },
       });
-      throw new Error(`WHOOP refresh failed, re-auth required: ${(err as Error).message}`);
+      // Return instead of throwing here: throwing would roll back the status update.
+      return { error: reauth ? 'WHOOP reconnection required' : 'WHOOP refresh temporarily unavailable' };
     }
 
     const now = new Date();
@@ -88,6 +91,8 @@ export async function refreshUnderLock(connectionId: string): Promise<string> {
         status: 'active',
       },
     });
-    return tokenSet.accessToken;
-  });
+    return { token: tokenSet.accessToken };
+  }, { timeout: 25000, maxWait: 25000 });
+  if (result.error) throw new Error(result.error);
+  return result.token!;
 }

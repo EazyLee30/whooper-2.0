@@ -2,11 +2,13 @@
 // Validates session + state, exchanges the code, persists the connection
 // with encrypted tokens. Tokens never leave the server.
 
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { exchangeCode } from '@/lib/whoop/oauth';
 import { encryptToken } from '@/lib/crypto/envelope';
 import { prisma } from '@/lib/db';
+import { queueSync, processSyncBudget } from '@/lib/sync/backfill';
+export const maxDuration = 120;
 
 
 export async function GET(req: Request): Promise<Response> {
@@ -31,12 +33,14 @@ export async function GET(req: Request): Promise<Response> {
   const tokenSet = await exchangeCode({ clientId, clientSecret, redirectUri, code });
 
   // Identify the WHOOP user with the fresh access token (server-side only).
-  const profile = (await (
-    await fetch('https://api.prod.whoop.com/developer/v2/user/profile/basic', {
+  const profileResponse = await fetch('https://api.prod.whoop.com/developer/v2/user/profile/basic', {
       headers: { Authorization: `Bearer ${tokenSet.accessToken}` },
-    })
-  ).json()) as { user_id?: number | string; [k: string]: unknown };
-  const whoopUserId = String(profile.user_id ?? 'unknown');
+      cache: 'no-store', signal: AbortSignal.timeout(15000),
+    });
+  if (!profileResponse.ok) return NextResponse.json({ error: 'WHOOP profile lookup failed' }, { status: 502 });
+  const profile = await profileResponse.json() as { user_id?: number | string };
+  if (profile.user_id == null) return NextResponse.json({ error: 'WHOOP profile missing identity' }, { status: 502 });
+  const whoopUserId = String(profile.user_id);
 
   const user = await prisma.user.upsert({
     where: { clerkUserId: userId },
@@ -45,7 +49,7 @@ export async function GET(req: Request): Promise<Response> {
   });
 
   const now = new Date();
-  await prisma.whoopConnection.upsert({
+  const conn = await prisma.whoopConnection.upsert({
     where: { userId_whoopUserId: { userId: user.id, whoopUserId } },
     create: {
       userId: user.id,
@@ -69,9 +73,11 @@ export async function GET(req: Request): Promise<Response> {
     },
   });
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? '/';
+  await queueSync(conn.id);
+  after(() => processSyncBudget(conn.id).then(() => undefined));
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? url.origin;
   const res = NextResponse.redirect(`${appUrl}/settings/connections?bound=1`);
-  res.cookies.delete('whooper_oauth_state');
-  res.cookies.delete('whooper_oauth_sub');
+  res.cookies.set('whooper_oauth_state', '', { path: '/api/auth/whoop/callback', maxAge: 0 });
+  res.cookies.set('whooper_oauth_sub', '', { path: '/api/auth/whoop/callback', maxAge: 0 });
   return res;
 }

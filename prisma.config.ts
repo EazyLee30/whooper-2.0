@@ -1,4 +1,6 @@
-import 'dotenv/config';
+import { config } from 'dotenv';
+config({ path: '.env.local', quiet: true });
+config({ quiet: true });
 import { defineConfig, env } from 'prisma/config';
 
 export default defineConfig({
