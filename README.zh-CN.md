@@ -14,7 +14,7 @@
 
 保留原 GPT 的完整教练指令和六类 WHOOP 数据功能，结合只读 MCP 工具、详情查询、每日快照与历史覆盖检查。每位用户登录自己的账号并授权自己的 WHOOP。
 
-**[公开试用](https://whooper-peach.vercel.app)** · [插件源码](plugin) · [隐私说明](https://whooper-peach.vercel.app/privacy)
+**[公开试用](https://whooper-peach.vercel.app)** · [下载插件安装包](https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.2.0) · [插件源码](plugin) · [隐私说明](https://whooper-peach.vercel.app/privacy)
 
 ## 功能
 

@@ -14,7 +14,7 @@ Your personal recovery, sleep and training coach — now a plugin for ChatGPT an
 
 Whooper carries forward the original GPT's coaching instructions and all six WHOOP data domains. The plugin combines a coaching skill with authenticated, read-only MCP tools. Each person signs in and connects their own WHOOP account.
 
-**[Open the public trial](https://whooper-peach.vercel.app)** · [Plugin source](plugin) · [Privacy](https://whooper-peach.vercel.app/privacy)
+**[Open the public trial](https://whooper-peach.vercel.app)** · [Download plugin](https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.2.0) · [Plugin source](plugin) · [Privacy](https://whooper-peach.vercel.app/privacy)
 
 ## What you can do
 
