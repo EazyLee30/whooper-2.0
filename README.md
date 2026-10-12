@@ -76,3 +76,11 @@ flowchart LR
 ```
 
 Independent community project; not affiliated with or endorsed by WHOOP. Coaching is informational and does not provide medical diagnosis.
+
+### Public workout accountability
+
+`GET /api/public/workout` powers EazyLee's personal website. A separately opted-in `public_workout_profiles` row fixes the owner server-side; clients cannot choose an account. It exposes only today's workout-recorded boolean, Shanghai date, check timestamp and daily nudge count. It does not expose workout details, WHOOP member IDs, tokens, sleep or recovery data. WHOOP reads reuse the existing refresh-safe v2 client, with a 60-second database cache and a refresh lease. A failed/stale read is `unavailable`, never an assumed missed workout.
+
+`POST /api/public/workout` accepts `{ "visitor": "<browser UUID v4>", "date": "YYYY-MM-DD" }` from the personal site's allowed origins. One browser can nudge once per Shanghai day; a database unique key makes concurrent retries idempotent. A daily hashed network limit caps obvious repeat voting at five browsers per network. No raw IP address is stored. This is an anonymous browser count, not a verified person count. The nudge is accepted only while a fresh check confirms no workout record. The counter persists in Postgres; frontend storage only remembers the anonymous browser UUID. No outbound notification is sent.
+
+Apply `prisma migrate deploy` before releasing this endpoint. Opt-in is a database administrator action: insert the explicit owner's WHOOP member ID into `public_workout_profiles` with slug `eazylee`, timezone `Asia/Shanghai`, enabled true. Never auto-select the first member in a multi-user database.

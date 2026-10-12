@@ -7,6 +7,7 @@ const isPublicRoute = createRouteMatcher([
   '/api/webhooks/whoop',
   '/.well-known/(.*)',
   '/api/mcp',
+  '/api/public/workout',
   '/api/jobs/reconcile',
 ]);
 

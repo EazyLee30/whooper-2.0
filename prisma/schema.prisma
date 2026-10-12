@@ -131,3 +131,36 @@ model AuditEvent {
 
   @@map("audit_events")
 }
+
+// Opt-in public accountability: only a daily boolean is exposed by the API.
+model PublicWorkoutProfile {
+  slug        String @id
+  whoopUserId String @map("whoop_user_id")
+  timezone    String @default("Asia/Shanghai")
+  enabled     Boolean @default(false)
+  days        PublicWorkoutDay[]
+  nudges      PublicWorkoutNudge[]
+  @@map("public_workout_profiles")
+}
+model PublicWorkoutDay {
+  profileSlug  String @map("profile_slug")
+  localDate    DateTime @map("local_date") @db.Date
+  trained      Boolean?
+  checkedAt    DateTime? @map("checked_at") @db.Timestamptz(6)
+  refreshAfter DateTime @default(now()) @map("refresh_after") @db.Timestamptz(6)
+  leaseUntil   DateTime @default(now()) @map("lease_until") @db.Timestamptz(6)
+  profile PublicWorkoutProfile @relation(fields:[profileSlug],references:[slug],onDelete:Cascade)
+  @@id([profileSlug,localDate])
+  @@map("public_workout_days")
+}
+model PublicWorkoutNudge {
+  profileSlug String @map("profile_slug")
+  localDate DateTime @map("local_date") @db.Date
+  visitorHash String @map("visitor_hash")
+  networkHash String @map("network_hash")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  profile PublicWorkoutProfile @relation(fields:[profileSlug],references:[slug],onDelete:Cascade)
+  @@id([profileSlug,localDate,visitorHash])
+  @@index([profileSlug,localDate,networkHash],map:"public_workout_nudges_network")
+  @@map("public_workout_nudges")
+}
