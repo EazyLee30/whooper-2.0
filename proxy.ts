@@ -9,6 +9,9 @@ const isPublicRoute = createRouteMatcher([
   '/api/mcp',
   '/api/public/workout',
   '/api/jobs/reconcile',
+  // One-time OAuth code handoff for the owner's AI assistant. The code is
+  // useless without the PKCE verifier, so this page needs no sign-in.
+  '/connect/muse',
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
