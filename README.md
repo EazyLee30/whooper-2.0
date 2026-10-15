@@ -10,7 +10,7 @@
 
 # Whooper
 
-Your personal recovery, sleep and training coach — now a plugin for ChatGPT and Codex.
+Your personal recovery, sleep and training coach — a plugin for ChatGPT and Codex, with authenticated MCP access from Muse.
 
 Whooper carries forward the original GPT's coaching instructions and all six WHOOP data domains. The plugin combines a coaching skill with authenticated, read-only MCP tools. Each person signs in and connects their own WHOOP account.
 
@@ -36,9 +36,26 @@ Ask: “Compare my recovery and sleep over the last seven days.” Or: “Given 
 3. Install the package in a client that supports portable plugins. The package lives in `plugin/`; it contains `plugin.json`, `mcp.json`, the coaching skill and brand assets.
 4. Authorize the plugin with the same Whooper account. Ask it to check your connection before requesting health data.
 
-The MCP endpoint is `https://whooper.ccwu.cc/api/mcp`. Adding that endpoint alone provides tools; install the complete plugin to include the original coaching instructions too.
+The MCP endpoint is `https://whooper.ccwu.cc/api/mcp`. Authenticated MCP clients receive coaching guidance in the initialization response and discover tools through `tools/list`; the complete plugin also packages that guidance as a portable skill with client metadata and brand assets.
 
 **Trial status:** this deployment uses a Clerk development instance. The WHOOP app is currently Sandbox: up to 10 connected members (1 connected when checked on October 10, 2026). Public source and a downloadable package do not mean approval or listing in the universal plugin directory. Real-account acceptance testing and directory submission are tracked separately.
+
+## Muse support
+
+Muse can query Whooper through the same authenticated, read-only MCP endpoint. **Verified on October 15, 2026:** OAuth authorization and refresh-token rotation, discovery of all 14 tools, connection status, daily snapshots, sleep/recovery/workout details, history coverage and sync status. Fresh-process queries and three concurrent helper processes also passed.
+
+The tested setup uses a **local helper in the Muse agent's VM**, not a native Muse connector or an installation of the portable plugin. The helper and its credentials are provisioned separately in that environment; they are not included in this repository. Once configured, ask Muse “How did I sleep last night?” or “Compare my recovery and workouts.”
+
+### Connect Muse
+
+1. Sign in to [Whooper](https://whooper.ccwu.cc) and connect your own WHOOP account first.
+2. In Clerk → Configure → Developers → OAuth applications, register `https://whooper.ccwu.cc/connect/muse` as an exact redirect URI on the public OAuth client used by Whooper. For your own deployment, substitute your application URL and client ID. Keep the existing client callbacks and consent screen enabled.
+3. Ask Muse to configure a persistent MCP helper for `https://whooper.ccwu.cc/api/mcp`. It must generate a fresh PKCE S256 verifier/challenge and random `state`, retain the verifier privately, and request `openid offline_access` with the MCP endpoint as `resource`. Use the authorization/token endpoints published by the authorization server's discovery document. The public trial's client ID is `EsrIyDTsryA3lxTL`.
+4. Have Muse show the authorization URL as plain text in a code block. Copy it into an external browser's address bar, sign in with the same Whooper account and approve. In the tested Muse client, clicking an OAuth link inside chat opened an Accounts dialog that closed without completing the flow.
+5. The callback page displays a one-time authorization code. Return it only to the trusted Muse session that holds the matching verifier. The helper must validate `state` and exchange the code with that verifier and the exact redirect URI. This is a manual code handoff; the callback page does not automatically exchange or store tokens.
+6. Verify `initialize`, `tools/list`, `get_connection_status` and a real `get_daily_snapshot` call. Persist Clerk credentials privately in the Muse VM (owner-only permissions, such as `0600`), serialize refresh-token rotation and atomically save the replacement credentials. Never publish access/refresh tokens or the PKCE verifier in chat, memory files or GitHub. WHOOP tokens remain encrypted on the Whooper server; requested health records are returned to the Muse conversation.
+
+If Clerk reports a redirect mismatch, check the exact callback in its allowlist. If a helper discovers no tools, parse Streamable HTTP JSON/SSE responses by JSON-RPC request ID; do not assume the final SSE event contains the result. Follow the negotiated MCP initialization/protocol lifecycle. The tested server is stateless and does not return an `Mcp-Session-Id`. Revoking the Clerk grant or losing the VM credentials requires reconnecting Muse; connecting Muse does not replace the separate WHOOP authorization.
 
 ## Run your own instance
 
@@ -60,7 +77,7 @@ npm run lint
 npm run build
 ```
 
-Daily reconciliation runs through `/api/jobs/reconcile` with a server-side cron secret. Historical sync resumes from stored page checkpoints. Tokens are encrypted at rest; health records are cached server-side. Requested records are sent to the ChatGPT or Codex conversation where you use the plugin.
+Daily reconciliation runs through `/api/jobs/reconcile` with a server-side cron secret. Historical sync resumes from stored page checkpoints. Tokens are encrypted at rest; health records are cached server-side. Requested records are sent to the ChatGPT, Codex or configured Muse conversation where you make the query.
 
 ## Architecture
 
@@ -68,7 +85,7 @@ Daily reconciliation runs through `/api/jobs/reconcile` with a server-side cron 
 flowchart LR
   User --> Clerk[Clerk sign-in + OAuth]
   User --> WHOOP[WHOOP consent]
-  Client[ChatGPT / Codex plugin] --> MCP[Authenticated MCP tools]
+  Client[ChatGPT / Codex / Muse MCP helper] --> MCP[Authenticated MCP tools]
   MCP --> API[WHOOP v2 API]
   MCP --> DB[(PostgreSQL)]
   WHOOP --> Sync[Webhooks + resumable sync]
