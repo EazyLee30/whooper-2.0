@@ -74,3 +74,11 @@ WHOOP 回调：`<APP_URL>/api/auth/whoop/callback`；Webhook：`<APP_URL>/api/we
 验证：`npm test`、`npm run lint`、`npm run build`。历史同步支持分页断点续传；每日 cron 使用服务端密钥。令牌加密存储，健康记录缓存在数据库中；查询的数据会返回发起请求的 ChatGPT、Codex 或已配置的 Muse 对话。
 
 独立社区项目，与 WHOOP 无关联或背书。教练建议用于信息参考，不提供医疗诊断。
+
+### Strength Trainer（可选）
+
+部署前运行 `npx prisma migrate deploy`，应用 `0003_strength_session` 迁移。在「连接设置」先完成 WHOOP OAuth 连接，再通过 Strength Trainer 表单登录**同一 WHOOP 账号**。支持短信、验证器和邮件验证码；密码不保存，会话沿用 `TOKEN_ENCRYPTION_KEY_BASE64` 加密并自动刷新。过期失效后可在此重新登录，也可单独断开。
+
+新增 MCP 工具：`list_strength_workouts`、`get_strength_workout`、`get_strength_exercise`、`get_strength_personal_records`。先列出训练，再用 workout UUID 查动作汇总；用汇总中的 `exercise_id` 查询逐组次数/重量与 PR。列表仅筛选一页，空页有 `nextCursor` 仍需翻页。字段与单位保留 WHOOP 原值；动作历史可能含多次训练，应按日期匹配。
+
+此功能参考 [Totem 的 Strength Trainer/Cognito 实现](https://github.com/thebriangao/totem)，使用 WHOOP App 私有接口，独立于官方 OAuth API，接口可能变动。数据按需实时读取，不加入后台回填或缓存覆盖统计。现有 OAuth 凭据不能代替 App 会话。部署后需实际登录并查询自己的训练才能确认上游兼容性。

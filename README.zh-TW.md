@@ -74,3 +74,11 @@ WHOOP 回呼：`<APP_URL>/api/auth/whoop/callback`；Webhook：`<APP_URL>/api/we
 驗證：`npm test`、`npm run lint`、`npm run build`。歷史同步支援分頁接續；每日 cron 使用伺服器端金鑰。權杖加密儲存，健康紀錄快取於資料庫；查詢的資料會回傳發起請求的 ChatGPT、Codex 或已設定的 Muse 對話。
 
 獨立社群專案，與 WHOOP 無關聯或背書。教練建議供資訊參考，不提供醫療診斷。
+
+### Strength Trainer（選用）
+
+部署前執行 `npx prisma migrate deploy`，套用 `0003_strength_session`。先連接 WHOOP OAuth，再於連接設定登入**同一 WHOOP 帳號**的 Strength Trainer。支援簡訊、驗證器與郵件驗證碼；密碼不儲存，獨立 App 工作階段以現有金鑰加密並自動更新，可單獨中斷連接。
+
+新增 `list_strength_workouts`、`get_strength_workout`、`get_strength_exercise`、`get_strength_personal_records` 工具，分別讀取訓練清單、動作彙總、逐組次數/重量歷史及個人紀錄。空白篩選頁仍須沿用 `nextCursor` 翻頁；保留原始欄位和單位，動作歷史須按日期比對訓練。
+
+參考 [Totem](https://github.com/thebriangao/totem) 的私有 WHOOP App 介面，可能隨上游更新失效。此資料即時按需讀取，不計入 OAuth 歷史同步覆蓋率。部署後需實際登入及查詢自己的訓練以確認相容性。

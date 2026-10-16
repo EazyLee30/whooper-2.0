@@ -6,7 +6,11 @@ function headers(req: Request) {
   const origin = req.headers.get('origin');
   return { 'Cache-Control': 'no-store', Vary: 'Origin', ...(allowedOrigin(origin) ? { 'Access-Control-Allow-Origin': origin!, 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type', 'Access-Control-Max-Age': '600' } : {}) };
 }
-function json(req: Request, data: unknown, status = 200) { return Response.json(data, { status, headers: headers(req) }); }
+function json(req: Request, data: unknown, status = 200) {
+  const result=headers(req); const origin=req.headers.get('origin');
+  const local=req.method==='GET'&&!!origin&&/^http:\/\/(localhost|127\.0\.0\.1):8765$/.test(origin);
+  return Response.json(data, {status,headers:{...result,...(local?{'Access-Control-Allow-Origin':origin!}:{})}});
+}
 export function OPTIONS(req: Request) { return new Response(null, { status: allowedOrigin(req.headers.get('origin')) ? 204 : 403, headers: headers(req) }); }
 export async function GET(req: Request) {
   const visitor = new URL(req.url).searchParams.get('visitor');

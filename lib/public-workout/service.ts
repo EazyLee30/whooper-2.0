@@ -1,3 +1,4 @@
+import { publicWorkoutHistory } from './history';
 import { prisma } from '@/lib/db';
 import { whoopGet, type WhoopPage } from '@/lib/whoop/client';
 import { localDayBounds } from '@/lib/whoop/records';
@@ -5,14 +6,14 @@ import { PROFILE, today, workoutRecorded, anonymousHash } from './policy';
 
 type Profile = { whoop_user_id: string; timezone: string };
 type Day = { trained: boolean | null; checked_at: Date | null; refresh_after: Date };
-export type PublicStatus = { date: string; timezone: string; status: 'recorded' | 'not_recorded' | 'unavailable'; checkedAt: string | null; nudges: number; nudged: boolean };
+export type PublicStatus = { date: string; timezone: string; status: 'recorded' | 'not_recorded' | 'unavailable'; checkedAt: string | null; nudges: number; nudged: boolean; history: {date:string;nudges:number;trained:boolean|null}[] };
 
 export async function workoutStatus(visitor?: string): Promise<PublicStatus> {
   const profiles = await prisma.$queryRaw<Profile[]>`SELECT whoop_user_id, timezone FROM public_workout_profiles WHERE slug=${PROFILE} AND enabled=true`;
   const profile = profiles[0];
   const timezone = profile?.timezone ?? 'Asia/Shanghai';
   const date = today(timezone);
-  const unavailable: PublicStatus = { date, timezone, status: 'unavailable', checkedAt: null, nudges: 0, nudged: false };
+  const unavailable: PublicStatus = { date, timezone, status: 'unavailable', checkedAt: null, nudges: 0, nudged: false, history: [] };
   if (!profile) return unavailable;
   await prisma.$executeRaw`INSERT INTO public_workout_days(profile_slug,local_date) VALUES (${PROFILE},${date}::date) ON CONFLICT DO NOTHING`;
   // A database lease prevents public traffic from issuing simultaneous WHOOP reads.
@@ -44,7 +45,7 @@ export async function workoutStatus(visitor?: string): Promise<PublicStatus> {
   const day = days[0];
   const counts = await prisma.$queryRaw<{ count: number; nudged: boolean }[]>`SELECT count(*)::int AS count,coalesce(bool_or(visitor_hash=${visitor ? anonymousHash(visitor,date) : ''}),false) AS nudged FROM public_workout_nudges WHERE profile_slug=${PROFILE} AND local_date=${date}::date`;
   const fresh = day?.checked_at && Date.now() - day.checked_at.getTime() < 120_000;
-  return { ...unavailable, status: fresh && day.trained !== null ? (day.trained ? 'recorded' : 'not_recorded') : 'unavailable', checkedAt: day?.checked_at?.toISOString() ?? null, nudges: counts[0].count, nudged: counts[0].nudged };
+  return { ...unavailable, status: fresh && day.trained !== null ? (day.trained ? 'recorded' : 'not_recorded') : 'unavailable', checkedAt: day?.checked_at?.toISOString() ?? null, nudges: counts[0].count, nudged: counts[0].nudged, history: await publicWorkoutHistory(profile.whoop_user_id,date,timezone) };
 }
 
 export async function nudge(visitor: string, network: string, date: string) {

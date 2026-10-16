@@ -82,3 +82,12 @@ identifiers, or authentication material into public logs or support issues.
 - `get_daily_snapshot` groups cycle starts, sleep ends, associated recoveries, and workout starts by the account's local date. It is a convenience; use list tools for narrower data needs.
 - `get_sync_status` and `get_data_coverage` describe the local history cache, not the full set of records available at WHOOP. Lists and detail tools read WHOOP live even before backfill completes. Do not confuse incomplete cache coverage with no WHOOP data.
 - Responses include `data` and freshness metadata. Do not infer that a cached response is live.
+
+## Strength Trainer
+
+- Check `get_connection_status.data.strength_trainer.status`. A public WHOOP OAuth connection alone does not enable private Strength Trainer access. Connect it separately at `/settings/connections`; never ask for credentials in chat.
+- `list_strength_workouts` accepts the same dates, limit and cursor as other lists. It filters one upstream page; follow `nextCursor` even when `items` is empty. It recognizes `weightlifting_msk`, `weightlifting`, and `powerlifting` sport names.
+- `get_strength_workout(workout_id)` returns the raw cardio details. Exercise aggregates are at `weightlifting_cardio_details.weightlifting_exercises.exercise_summary_carousel.items`. A row without `exercise_id` is the workout total; do not count it as an exercise.
+- `get_strength_exercise(exercise_id)` returns metadata, exercise history with individual sets, and personal records. Read the returned session dates to match the requested workout; do not treat all exercise history as belonging to one workout.
+- `get_strength_personal_records` returns the upstream PR collection. Preserve explicit kg/lb units; never assume a display value is kg or invent individual set weights from totals.
+- Strength tools read live using a separately encrypted private App session. They are not part of OAuth backfill/cache coverage. Private endpoints can change; report failures without claiming empty history.

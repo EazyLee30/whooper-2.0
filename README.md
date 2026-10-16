@@ -101,3 +101,25 @@ Independent community project; not affiliated with or endorsed by WHOOP. Coachin
 `POST /api/public/workout` accepts `{ "visitor": "<browser UUID v4>", "date": "YYYY-MM-DD" }` from the personal site's allowed origins. One browser can nudge once per Shanghai day; a database unique key makes concurrent retries idempotent. A daily hashed network limit caps obvious repeat voting at five browsers per network. No raw IP address is stored. This is an anonymous browser count, not a verified person count. The nudge is accepted only while a fresh check confirms no workout record. The counter persists in Postgres; frontend storage only remembers the anonymous browser UUID. No outbound notification is sent.
 
 Apply `prisma migrate deploy` before releasing this endpoint. Opt-in is a database administrator action: insert the explicit owner's WHOOP member ID into `public_workout_profiles` with slug `eazylee`, timezone `Asia/Shanghai`, enabled true. Never auto-select the first member in a multi-user database.
+
+### Optional Strength Trainer
+
+Apply `npx prisma migrate deploy` before deploying this version (`0003_strength_session`). After connecting WHOOP OAuth, sign into the **same WHOOP account** in the Strength Trainer section of connection settings. SMS, authenticator and email codes are supported. Passwords are not stored; the separate App session is encrypted with the existing token key, refreshed under a database lock, and removable independently or through account deletion.
+
+New read tools: `list_strength_workouts` (follow cursors even for empty filtered pages), `get_strength_workout` (exercise aggregates), `get_strength_exercise` (individual sets/history and PRs), and `get_strength_personal_records`. Original fields and units are preserved. Match exercise-history sessions to workout dates. Strength reads are live and excluded from OAuth backfill/cache coverage.
+
+Protocol research: [Totem](https://github.com/thebriangao/totem), specifically its Cognito proxy, cardio-details and weightlifting-service readers. These are private WHOOP App endpoints and may change; public OAuth alone cannot access them. Live compatibility requires signing in and reading a real account after deployment.
+
+### Public personal workout page
+
+The enabled `eazylee` public profile can publish minimized completed Strength Trainer
+sessions at `GET /api/public/workout/strength`, with optional `date=YYYY-MM-DD` and
+`workout=UUID`. Workout IDs are matched against that owner's dated workout list;
+this endpoint never accepts a user or connection identity. Results contain date,
+duration, strain, volume and completed exercise sets only. Unknown loads remain
+null, planned unlogged rows are omitted, and explicit lb values stay labeled lbs.
+The server caches reads for 60 seconds and checks profile/session access before
+using cached data. Disabling the profile immediately disables public reads.
+`/api/public/workout` also returns seven days of deduplicated nudge counts and
+WHOOP workout status, with unknown status on failed reads. The personal site
+refreshes these public feeds directly; no Muse polling or token in GitHub is needed.

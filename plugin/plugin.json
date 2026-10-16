@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "whooper",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Personal WHOOP coach with recovery, sleep, strain, workout and historical data tools.",
   "author": {
     "name": "EazyLee30"
@@ -82,7 +82,7 @@
         }
       },
       "publication": {
-        "release_notes": "Cloud MCP coaching instructions and public submission metadata.",
+        "release_notes": "Optional Strength Trainer connection with workout details, individual exercise sets and personal records.",
         "translations": {
           "zh-CN": {
             "subtitle": "你的恢复、睡眠与训练教练",

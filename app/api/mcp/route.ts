@@ -21,7 +21,7 @@ const handler = createMcpHandler(
     // P1: analytics/write tools register here.
   },
   {
-    serverInfo: { name: 'whooper', version: '0.2.0' },
+    serverInfo: { name: 'whooper', version: '0.3.0' },
     instructions: coachingInstructions,
   },
 );

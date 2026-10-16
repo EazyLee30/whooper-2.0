@@ -8,14 +8,16 @@ import { clerkSub } from '@/lib/auth/clerk';
 import { whoopGet, COLLECTION_ENDPOINT, type Collection, type WhoopPage, WhoopApiError } from '@/lib/whoop/client';
 import { localDayBounds, normalizeDate, snapshotForDay, type WhoopRecordPayload } from '@/lib/whoop/records';
 import { DateTime } from 'luxon';
+import { strengthGet } from '@/lib/whoop/strength/session';
+import { listStrengthWorkouts, strengthWorkout, strengthExercise } from '@/lib/whoop/strength/queries';
 
 const dateSchema = z.string().describe('ISO 8601 datetime or local YYYY-MM-DD');
 
-function envelope(data: unknown, opts: { timezone: string; cached: boolean; warnings?: string[] }) {
+function envelope(data: unknown, opts: { timezone: string; cached: boolean; warnings?: string[]; source?: string }) {
   return {
     data,
     metadata: {
-      source: 'whoop_api_v2',
+      source: opts.source ?? 'whoop_api_v2',
       as_of: new Date().toISOString(),
       timezone: opts.timezone,
       cached: opts.cached,
@@ -85,13 +87,59 @@ export function registerReadTools(server: McpServer) {
       const sub = clerkSub(authOf(ctx));
       const user = await prisma.user.findUnique({ where: { clerkUserId: sub } });
       const conn = user ? await prisma.whoopConnection.findFirst({ where: { userId: user.id }, orderBy: { updatedAt: 'desc' } }) : null;
-      const result = envelope({ status: conn?.status ?? 'not_connected', scopes: conn?.scopes ?? [],
+      const strength = conn ? await prisma.strengthSession.findUnique({ where: { connectionId: conn.id }, select: { status: true, tokenExpiresAt: true } }) : null;
+      const result = envelope({ strength_trainer: { status: strength?.status ?? 'not_connected', token_expires_at: strength?.tokenExpiresAt }, status: conn?.status ?? 'not_connected', scopes: conn?.scopes ?? [],
         token_expires_at: conn?.tokenExpiresAt, last_refresh_at: conn?.lastRefreshAt,
         connect_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings/connections`,
       }, { timezone: user?.preferredTimezone ?? 'Asia/Shanghai', cached: true });
       return { content: [{ type: 'text', text: JSON.stringify(result) }], structuredContent: result };
     },
   );
+
+  server.registerTool('list_strength_workouts', {
+    description: 'Strength Trainer / weightlifting workout history, one filtered page. Follow nextCursor even on empty pages. Requires separate Strength Trainer login.',
+    inputSchema: z.object(paginationInput),
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+  }, async (args, ctx) => {
+    const { user, conn } = await getConnectionFor(clerkSub(authOf(ctx)));
+    const start = normalizeDate(args.from, user.preferredTimezone);
+    const end = normalizeDate(args.to, user.preferredTimezone);
+    if (start && end && start >= end) throw new Error('from must be earlier than to (exclusive)');
+    const data = await listStrengthWorkouts((path, params) => strengthGet(conn.id, path, params), {
+      limit: String(args.limit), ...(start ? { start } : {}), ...(end ? { end } : {}), ...(args.cursor ? { nextToken: args.cursor } : {}),
+    });
+    const result = envelope(data, { timezone: user.preferredTimezone, cached: false, source: 'whoop_private_api' });
+    return { content: [{ type: 'text', text: JSON.stringify(result) }], structuredContent: result };
+  });
+  server.registerTool('get_strength_workout', {
+    description: 'Strength workout cardio details including exercise_summary_carousel, set counts, total reps, tonnage with original units, and muscular/cardio breakdown. Individual set weights require get_strength_exercise.',
+    inputSchema: z.object({ workout_id: z.string().uuid() }),
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+  }, async (args, ctx) => {
+    const { user, conn } = await getConnectionFor(clerkSub(authOf(ctx)));
+    const data = await strengthWorkout((path, params) => strengthGet(conn.id, path, params), args.workout_id);
+    const result = envelope(data, { timezone: user.preferredTimezone, cached: false, source: 'whoop_private_api' });
+    return { content: [{ type: 'text', text: JSON.stringify(result) }], structuredContent: result };
+  });
+  server.registerTool('get_strength_exercise', {
+    description: 'Exercise metadata, history with individual sets/reps/weights, and personal records. Use an exercise_id from get_strength_workout. Retains upstream units and history shape.',
+    inputSchema: z.object({ exercise_id: z.string().min(1).max(250) }),
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+  }, async (args, ctx) => {
+    const { user, conn } = await getConnectionFor(clerkSub(authOf(ctx)));
+    const data = await strengthExercise((path, params) => strengthGet(conn.id, path, params), args.exercise_id);
+    const result = envelope(data, { timezone: user.preferredTimezone, cached: false, source: 'whoop_private_api' });
+    return { content: [{ type: 'text', text: JSON.stringify(result) }], structuredContent: result };
+  });
+  server.registerTool('get_strength_personal_records', {
+    description: 'All Strength Trainer personal records with original fields and units. Requires separate Strength Trainer login.',
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+  }, async (ctx: ServerContext) => {
+    const { user, conn } = await getConnectionFor(clerkSub(authOf(ctx)));
+    const data = await strengthGet(conn.id, '/weightlifting-service/v3/prs');
+    const result = envelope(data, { timezone: user.preferredTimezone, cached: false, source: 'whoop_private_api' });
+    return { content: [{ type: 'text', text: JSON.stringify(result) }], structuredContent: result };
+  });
 
   server.registerTool(
     'get_whoop_profile',

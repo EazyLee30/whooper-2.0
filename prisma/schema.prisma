@@ -38,6 +38,7 @@ model WhoopConnection {
   user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   records WhoopRecord[]
   syncJobs SyncJob[]
+  strengthSession StrengthSession?
 
   @@unique([userId, whoopUserId])
   @@map("whoop_connections")
@@ -163,4 +164,16 @@ model PublicWorkoutNudge {
   @@id([profileSlug,localDate,visitorHash])
   @@index([profileSlug,localDate,networkHash],map:"public_workout_nudges_network")
   @@map("public_workout_nudges")
+}
+
+// Separate from public OAuth: WHOOP app Cognito session, never stores passwords.
+model StrengthSession {
+  connectionId String @id @map("connection_id")
+  accessCiphertext String @map("access_ciphertext") @db.Text
+  refreshCiphertext String @map("refresh_ciphertext") @db.Text
+  tokenExpiresAt DateTime @map("token_expires_at") @db.Timestamptz(6)
+  status String @default("active")
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  connection WhoopConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  @@map("strength_sessions")
 }

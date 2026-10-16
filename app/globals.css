@@ -65,6 +65,67 @@ button:disabled {
 li {
   line-height: 1.8;
 }
+/* Strength Trainer connection form. */
+.strength-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.strength-header h2 { margin: 0; font-weight: 600; }
+.strength-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 999px;
+  padding: 6px 11px;
+  background: #f1f3ef;
+  color: #68756c;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.strength-badge > span { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.strength-badge.is-connected { background: #eaf3e9; color: #396443; }
+.strength-card .strength-description { color: #64736b; font-size: 14px; line-height: 1.8; margin: 18px 0 24px; }
+.strength-form fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.strength-form legend { padding: 0; margin-bottom: 18px; font-size: 14px; font-weight: 600; }
+.strength-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.strength-fields label { display: flex; flex-direction: column; gap: 9px; min-width: 0; font-size: 13px; font-weight: 500; }
+.strength-fields input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid #d7e1d9;
+  border-radius: 10px;
+  background: #fafbf8;
+  padding: 12px 14px;
+  color: #14271f;
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.strength-fields input::placeholder { color: #8b978f; }
+.strength-fields input:focus-visible { border-color: #557d60; box-shadow: 0 0 0 3px #e8f0e6; }
+.strength-card .strength-hint { font-size: 12px; font-weight: 400; color: #78847c; line-height: 1.7; }
+.strength-form p.strength-hint { margin: 12px 0 0; }
+.strength-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+.strength-actions button { min-height: 44px; font-size: 13px; font-weight: 500; padding: 11px 18px; }
+.strength-card .strength-secondary { border: 1px solid #d7e1d9; background: #fff; color: #284d3a; }
+.strength-card .strength-secondary:hover { background: #f5f8f2; }
+.strength-card .strength-disconnect { background: transparent; color: #8b6256; font-size: 13px; }
+.strength-card button:focus-visible, .strength-privacy summary:focus-visible { outline: 2px solid #557d60; outline-offset: 4px; }
+.strength-privacy { margin-top: 24px; padding-top: 18px; border-top: 1px solid #edf0e9; color: #78847c; font-size: 12px; }
+.strength-privacy summary { cursor: pointer; width: fit-content; }
+.strength-privacy p { margin: 10px 0 0; line-height: 1.8; }
+.strength-card .strength-message { color: #396443; font-size: 13px; margin: 14px 0 0; }
+.strength-message:empty { display: none; }
+@media (max-width: 600px) {
+  .strength-fields { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .strength-card { padding: 22px; }
+}
 /* Public landing: scoped tokens keep authenticated pages independent. */
 .landing {
   --ink: #18372d;
