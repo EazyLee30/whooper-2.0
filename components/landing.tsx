@@ -371,13 +371,13 @@ export default function Landing() {
             ))}
           </div>
           <div className="endpoint">
-            <code>https://whooper.ccwu.cc/api/mcp</code>
+            <code>https://whooper.eazylee.si/api/mcp</code>
             <button
               className="copy-btn"
               onClick={async () => {
                 try {
                   await navigator.clipboard.writeText(
-                    "https://whooper.ccwu.cc/api/mcp",
+                    "https://whooper.eazylee.si/api/mcp",
                   );
                   setCopied(true);
                 } catch {

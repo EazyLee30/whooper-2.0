@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
     return ["/", "/privacy", "/sign-in/:path*", "/settings/:path*", "/api/auth/whoop/start"].map(source => ({
       source,
       has: [{ type: "host" as const, value: "whooper-peach.vercel.app" }],
-      destination: `https://whooper.ccwu.cc${source}`,
+      destination: `https://whooper.eazylee.si${source}`,
       permanent: false,
     }));
   },

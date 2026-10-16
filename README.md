@@ -1,6 +1,6 @@
 <p align="center"><img src="docs/assets/banner.png" alt="Whooper — Know your rhythm." width="100%"></p>
 <p align="center">
-<a href="https://whooper.ccwu.cc"><img src="https://img.shields.io/badge/Public_trial-Visit-143F32?style=flat-square" alt="Public trial"></a>
+<a href="https://whooper.eazylee.si"><img src="https://img.shields.io/badge/Public_trial-Visit-143F32?style=flat-square" alt="Public trial"></a>
 <a href="https://github.com/EazyLee30/whooper-2.0/actions/workflows/checks.yml"><img src="https://github.com/EazyLee30/whooper-2.0/actions/workflows/checks.yml/badge.svg" alt="Checks"></a>
 <img src="https://img.shields.io/badge/Plugin-v0.2.1-8EDDA8?style=flat-square" alt="Plugin v0.2.1">
 <img src="https://img.shields.io/badge/WHOOP_API-v2-143F32?style=flat-square" alt="WHOOP API v2">
@@ -14,7 +14,7 @@ Your personal recovery, sleep and training coach — a plugin for ChatGPT and Co
 
 Whooper carries forward the original GPT's coaching instructions and all six WHOOP data domains. The plugin combines a coaching skill with authenticated, read-only MCP tools. Each person signs in and connects their own WHOOP account.
 
-**[Open the public trial](https://whooper.ccwu.cc)** · [Download plugin](https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.2.1) · [Plugin source](plugin) · [Privacy](https://whooper.ccwu.cc/privacy)
+**[Open the public trial](https://whooper.eazylee.si)** · [Download plugin](https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.2.1) · [Plugin source](plugin) · [Privacy](https://whooper.eazylee.si/privacy)
 
 ## What you can do
 
@@ -36,7 +36,7 @@ Ask: “Compare my recovery and sleep over the last seven days.” Or: “Given 
 3. Install the package in a client that supports portable plugins. The package lives in `plugin/`; it contains `plugin.json`, `mcp.json`, the coaching skill and brand assets.
 4. Authorize the plugin with the same Whooper account. Ask it to check your connection before requesting health data.
 
-The MCP endpoint is `https://whooper.ccwu.cc/api/mcp`. Authenticated MCP clients receive coaching guidance in the initialization response and discover tools through `tools/list`; the complete plugin also packages that guidance as a portable skill with client metadata and brand assets.
+The MCP endpoint is `https://whooper.eazylee.si/api/mcp`. Authenticated MCP clients receive coaching guidance in the initialization response and discover tools through `tools/list`; the complete plugin also packages that guidance as a portable skill with client metadata and brand assets.
 
 **Trial status:** this deployment uses a Clerk development instance. The WHOOP app is currently Sandbox: up to 10 connected members (1 connected when checked on October 10, 2026). Public source and a downloadable package do not mean approval or listing in the universal plugin directory. Real-account acceptance testing and directory submission are tracked separately.
 
@@ -48,9 +48,9 @@ The tested setup uses a **local helper in the Muse agent's VM**, not a native Mu
 
 ### Connect Muse
 
-1. Sign in to [Whooper](https://whooper.ccwu.cc) and connect your own WHOOP account first.
-2. In Clerk → Configure → Developers → OAuth applications, register `https://whooper.ccwu.cc/connect/muse` as an exact redirect URI on the public OAuth client used by Whooper. For your own deployment, substitute your application URL and client ID. Keep the existing client callbacks and consent screen enabled.
-3. Ask Muse to configure a persistent MCP helper for `https://whooper.ccwu.cc/api/mcp`. It must generate a fresh PKCE S256 verifier/challenge and random `state`, retain the verifier privately, and request `openid offline_access` with the MCP endpoint as `resource`. Use the authorization/token endpoints published by the authorization server's discovery document. The public trial's client ID is `EsrIyDTsryA3lxTL`.
+1. Sign in to [Whooper](https://whooper.eazylee.si) and connect your own WHOOP account first.
+2. In Clerk → Configure → Developers → OAuth applications, register `https://whooper.eazylee.si/connect/muse` as an exact redirect URI on the public OAuth client used by Whooper. For your own deployment, substitute your application URL and client ID. Keep the existing client callbacks and consent screen enabled.
+3. Ask Muse to configure a persistent MCP helper for `https://whooper.eazylee.si/api/mcp`. It must generate a fresh PKCE S256 verifier/challenge and random `state`, retain the verifier privately, and request `openid offline_access` with the MCP endpoint as `resource`. Use the authorization/token endpoints published by the authorization server's discovery document. The public trial's client ID is `EsrIyDTsryA3lxTL`.
 4. Have Muse show the authorization URL as plain text in a code block. Copy it into an external browser's address bar, sign in with the same Whooper account and approve. In the tested Muse client, clicking an OAuth link inside chat opened an Accounts dialog that closed without completing the flow.
 5. The callback page displays a one-time authorization code. Return it only to the trusted Muse session that holds the matching verifier. The helper must validate `state` and exchange the code with that verifier and the exact redirect URI. This is a manual code handoff; the callback page does not automatically exchange or store tokens.
 6. Verify `initialize`, `tools/list`, `get_connection_status` and a real `get_daily_snapshot` call. Persist Clerk credentials privately in the Muse VM (owner-only permissions, such as `0600`), serialize refresh-token rotation and atomically save the replacement credentials. Never publish access/refresh tokens or the PKCE verifier in chat, memory files or GitHub. WHOOP tokens remain encrypted on the Whooper server; requested health records are returned to the Muse conversation.

@@ -1,6 +1,6 @@
 <p align="center"><img src="docs/assets/banner.png" alt="Whooper — Know your rhythm." width="100%"></p>
 <p align="center">
-<a href="https://whooper.ccwu.cc"><img src="https://img.shields.io/badge/Public_trial-Visit-143F32?style=flat-square" alt="Public trial"></a>
+<a href="https://whooper.eazylee.si"><img src="https://img.shields.io/badge/Public_trial-Visit-143F32?style=flat-square" alt="Public trial"></a>
 <a href="https://github.com/EazyLee30/whooper-2.0/actions/workflows/checks.yml"><img src="https://github.com/EazyLee30/whooper-2.0/actions/workflows/checks.yml/badge.svg" alt="Checks"></a>
 <img src="https://img.shields.io/badge/Plugin-v0.2.1-8EDDA8?style=flat-square" alt="Plugin v0.2.1">
 <img src="https://img.shields.io/badge/WHOOP_API-v2-143F32?style=flat-square" alt="WHOOP API v2">
@@ -14,7 +14,7 @@
 
 保留原 GPT 的完整教练指令和六类 WHOOP 数据功能，结合只读 MCP 工具、详情查询、每日快照与历史覆盖检查。每位用户登录自己的账号并授权自己的 WHOOP。
 
-**[公开试用](https://whooper.ccwu.cc)** · [下载插件安装包](https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.2.1) · [插件源码](plugin) · [隐私说明](https://whooper.ccwu.cc/privacy)
+**[公开试用](https://whooper.eazylee.si)** · [下载插件安装包](https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.2.1) · [插件源码](plugin) · [隐私说明](https://whooper.eazylee.si/privacy)
 
 ## 功能
 
@@ -36,7 +36,7 @@
 3. 在支持 portable plugin 的客户端安装 `plugin/` 中的完整插件包。
 4. 用同一 Whooper 账号授权插件，先检查连接，再查询数据。
 
-MCP 地址：`https://whooper.ccwu.cc/api/mcp`。认证 MCP 客户端会在初始化响应中获得教练指引，并通过 `tools/list` 发现工具；完整插件还将指引打包为 portable skill，并附带客户端元数据与品牌素材。
+MCP 地址：`https://whooper.eazylee.si/api/mcp`。认证 MCP 客户端会在初始化响应中获得教练指引，并通过 `tools/list` 发现工具；完整插件还将指引打包为 portable skill，并附带客户端元数据与品牌素材。
 
 **试用状态：**目前使用 Clerk 开发实例；WHOOP 应用目前为 Sandbox，最多连接 10 人（2026-10-10 检查时已连接 1 人）。源码公开和提供安装包不等于已通过通用插件目录审核。真实账号验收与目录提交分别进行。
 
@@ -48,9 +48,9 @@ Muse 可通过同一认证只读 MCP 接口查询 Whooper。**2026-10-15 已验�
 
 ### 接入 Muse
 
-1. 先登录 [Whooper](https://whooper.ccwu.cc)，连接自己的 WHOOP 账户。
-2. 在 Clerk → Configure → Developers → OAuth applications 中，为 Whooper 使用的公共 OAuth 客户端登记精确回调地址 `https://whooper.ccwu.cc/connect/muse`。自行部署时替换域名及 client ID，保留已有回调地址和授权确认页。
-3. 让 Muse 为 `https://whooper.ccwu.cc/api/mcp` 配置持久化 MCP helper：生成新的 PKCE S256 verifier/challenge 和随机 `state`，私下保留 verifier，以 `openid offline_access` 为 scope、MCP 地址为 `resource` 发起授权。授权和令牌端点从授权服务器的 discovery 文档读取；公开试用的 client ID 为 `EsrIyDTsryA3lxTL`。
+1. 先登录 [Whooper](https://whooper.eazylee.si)，连接自己的 WHOOP 账户。
+2. 在 Clerk → Configure → Developers → OAuth applications 中，为 Whooper 使用的公共 OAuth 客户端登记精确回调地址 `https://whooper.eazylee.si/connect/muse`。自行部署时替换域名及 client ID，保留已有回调地址和授权确认页。
+3. 让 Muse 为 `https://whooper.eazylee.si/api/mcp` 配置持久化 MCP helper：生成新的 PKCE S256 verifier/challenge 和随机 `state`，私下保留 verifier，以 `openid offline_access` 为 scope、MCP 地址为 `resource` 发起授权。授权和令牌端点从授权服务器的 discovery 文档读取；公开试用的 client ID 为 `EsrIyDTsryA3lxTL`。
 4. 让 Muse 把授权 URL 放在纯文本代码块中，复制到外部浏览器地址栏，用同一 Whooper 账号登录并批准。实测 Muse 客户端直接点击聊天内的 OAuth 链接会弹出 Accounts 窗口，随后关闭而未完成流程。
 5. 回调页显示一次性授权码，只交给持有匹配 verifier 的可信 Muse 会话。helper 必须校验 `state`，用该 verifier 和完全一致的回调地址交换令牌。这是手动授权码交接，回调页不会自动换取或保存令牌。
 6. 验证 `initialize`、`tools/list`、`get_connection_status` 及真实 `get_daily_snapshot`。Clerk 凭证私存于 Muse VM，采用仅所有者可读写的权限（如 `0600`）；刷新轮换须串行执行并原子保存新凭证。Access／refresh token 和 verifier 不得写入聊天、记忆文件或 GitHub。WHOOP 令牌仍由 Whooper 服务端加密保存，查询出的健康数据会返回 Muse 对话。

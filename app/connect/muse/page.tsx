@@ -57,7 +57,7 @@ function CodeView() {
             )}
             <p style={{ fontSize: 14, color: '#666' }}>
               If this mentions redirect_uri, add{' '}
-              <code>https://whooper.ccwu.cc/connect/muse</code> to the Redirect
+              <code>https://whooper.eazylee.si/connect/muse</code> to the Redirect
               URIs of the Whooper MCP OAuth application in the Clerk dashboard,
               then try the authorization link again.
             </p>
