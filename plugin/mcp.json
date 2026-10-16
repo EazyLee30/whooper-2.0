@@ -3,7 +3,7 @@
   "mcpServers": {
     "whooper": {
       "type": "streamable-http",
-      "url": "https://whooper.ccwu.cc/api/mcp",
+      "url": "https://whooper.eazylee.si/api/mcp",
       "extensions": {
         "com.openai": {
           "auth": {

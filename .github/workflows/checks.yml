@@ -19,5 +19,5 @@ jobs:
       - run: npm run build
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/test
-          NEXT_PUBLIC_APP_URL: https://whooper-peach.vercel.app
+          NEXT_PUBLIC_APP_URL: https://whooper.eazylee.si
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_ZW1lcmdpbmctcmF5LTUxMzAuY2xlcmsuYWNjb3VudHMuZGV2JA

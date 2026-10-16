@@ -3,7 +3,7 @@
 Checked on October 10, 2026.
 
 - Public repository: https://github.com/EazyLee30/whooper-2.0
-- Public trial: https://whooper.ccwu.cc
+- Public trial: https://whooper.eazylee.si
 - Package: https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.2.1
 - Six original WHOOP data domains and original coaching instructions included.
 - Fourteen authenticated read tools; tokens stay server-side.
