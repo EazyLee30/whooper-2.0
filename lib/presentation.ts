@@ -1,5 +1,13 @@
 export const THEMES = [
   {
+    id: "whooper",
+    name: "Whooper",
+    background: "#f6f7f0",
+    ink: "#18372d",
+    accent: "#18372d",
+    dark: false,
+  },
+  {
     id: "flexoki",
     name: "Flexoki",
     background: "#fffcf0",

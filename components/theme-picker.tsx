@@ -22,16 +22,16 @@ const subscribe = (callback: () => void) => {
 const readTheme = (): ThemeId => {
   try {
     const value = localStorage.getItem(STORAGE_KEY);
-    return isThemeId(value) ? value : "flexoki";
+    return isThemeId(value) ? value : "whooper";
   } catch {
-    return "flexoki";
+    return "whooper";
   }
 };
 export function useTheme() {
   const theme = useSyncExternalStore(
     subscribe,
     readTheme,
-    () => "flexoki" as ThemeId,
+    () => "whooper" as ThemeId,
   );
   const setTheme = (value: ThemeId) => {
     try {

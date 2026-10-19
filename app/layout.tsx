@@ -18,7 +18,7 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: "Whooper — Your recovery. A clearer tomorrow.",
   description:
-    "Your WHOOP dashboard, workout journal and share studio. Bring your recovery, sleep and training context to your AI coach.",
+    "Your WHOOP dashboard, workout journal and share studio. Explore your recovery, sleep and training records.",
 };
 
 export default function RootLayout({

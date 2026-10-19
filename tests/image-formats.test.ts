@@ -17,9 +17,9 @@ test("Instagram canvases contain complete pages with no clipping, including very
       const target = IMAGE_FORMATS[format];
       assert.equal(box.width, 1080);
       assert.equal(box.height, target.height);
-      assert.ok(box.x >= 24 - 1e-8);
+      assert.ok(box.x >= 0 - 1e-8);
       assert.ok(box.y >= target.insetY - 1e-8);
-      assert.ok(box.x + box.drawWidth <= box.width - 24 + 1e-8);
+      assert.ok(box.x + box.drawWidth <= box.width + 1e-8);
       assert.ok(box.y + box.drawHeight <= box.height - target.insetY + 1e-8);
       assert.ok(
         Math.abs(box.drawWidth / box.drawHeight - width / height) < 1e-8,
@@ -28,10 +28,10 @@ test("Instagram canvases contain complete pages with no clipping, including very
   }
 });
 
-test("movement pagination budgets preserve header, credits and Story safe areas", () => {
-  assert.equal(imageBodyHeight("post", 270, 180), 836);
-  assert.equal(imageBodyHeight("square", 270, 180), 566);
-  assert.equal(imageBodyHeight("story", 270, 180), 970);
+test("movement pagination budgets preserve header, credits without extra decorative padding", () => {
+  assert.equal(imageBodyHeight("post", 270, 180), 900);
+  assert.equal(imageBodyHeight("square", 270, 180), 630);
+  assert.equal(imageBodyHeight("story", 270, 180), 1470);
   assert.equal(imageBodyHeight("original", 270, 180), 15550);
   assert.deepEqual(imagePlacement(1086, 1556, "original"), {
     width: 1086,

@@ -121,7 +121,7 @@ export function ImageExport({
       </div>
       <p className="dash-preview-note">
         Post 可用于单图或轮播；Story
-        预留上下留白。长记录自动分张，保留动作、组数和素材署名。
+        使用竖版。长记录自动分张，保留动作、组数和素材署名。
       </p>
       {images.length ? (
         <motion.div

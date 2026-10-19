@@ -1,7 +1,7 @@
-import type { PublicStrength } from '@/lib/public-workout/strength-data';
-import type { TemplateId } from '@/lib/presentation';
+import type { PublicStrength } from "@/lib/public-workout/strength-data";
+import type { TemplateId } from "@/lib/presentation";
 
-export type { TemplateId } from '@/lib/presentation';
+export type { TemplateId } from "@/lib/presentation";
 
 export type WorkoutSummary = {
   id: string;
@@ -17,16 +17,28 @@ export type WorkoutSummary = {
 export type DashboardData = {
   timezone: string;
   date: string;
-  connectionStatus: 'active' | 'not_connected' | 'reauth_required';
+  connectionStatus: "active" | "not_connected" | "reauth_required";
   strengthConnected: boolean;
   workouts: WorkoutSummary[];
-  metrics: { recovery: number | null; sleepHours: number | null; strain: number | null; hrv: number | null; restingHr: number | null };
+  metrics: {
+    recovery: number | null;
+    sleepHours: number | null;
+    strain: number | null;
+    hrv: number | null;
+    restingHr: number | null;
+  };
   week: { date: string; trained: boolean | null; strain: number | null }[];
   updatedAt: string | null;
   notice?: string;
 };
 
-export type ShareSnapshot = { version: 1; title: string; workout: WorkoutSummary; strength: PublicStrength | null };
+export type ShareSnapshot = {
+  profile?: import("@/lib/profile/schema").ShareProfile;
+  version: 1;
+  title: string;
+  workout: WorkoutSummary;
+  strength: PublicStrength | null;
+};
 export type ShareRecord = {
   id: string;
   token: string;

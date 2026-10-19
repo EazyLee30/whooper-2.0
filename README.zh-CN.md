@@ -2,7 +2,7 @@
 <p align="center">
 <a href="https://whooper.eazylee.si"><img src="https://img.shields.io/badge/Public_trial-Visit-143F32?style=flat-square" alt="Public trial"></a>
 <a href="https://github.com/EazyLee30/whooper-2.0/actions/workflows/checks.yml"><img src="https://github.com/EazyLee30/whooper-2.0/actions/workflows/checks.yml/badge.svg" alt="Checks"></a>
-<img src="https://img.shields.io/badge/Plugin-v0.2.1-8EDDA8?style=flat-square" alt="Plugin v0.2.1">
+<img src="https://img.shields.io/badge/Plugin-v0.3.2-8EDDA8?style=flat-square" alt="Plugin v0.3.2">
 <img src="https://img.shields.io/badge/WHOOP_API-v2-143F32?style=flat-square" alt="WHOOP API v2">
 <img src="https://img.shields.io/badge/MCP-Streamable_HTTP-FF735D?style=flat-square" alt="MCP Streamable HTTP">
 </p>
@@ -10,13 +10,16 @@
 
 # Whooper
 
-你的 WHOOP 数据看板、训练日志与分享工作室，同时提供 ChatGPT 和 Codex 教练插件，并支持 Muse 通过认证 MCP 接入。
+你的 WHOOP 数据看板、训练日志与分享工作室，同时提供 ChatGPT 和 Codex 数据插件，并支持 Muse 通过认证 MCP 接入。
 
-登录后，在私人工作台查看恢复、睡眠和训练，展开 Strength Trainer 逐组记录，再为一次训练选择分享样式。同时保留原 GPT 的完整教练指令、六类 WHOOP 数据和认证只读 MCP 工具。每位用户连接自己的 WHOOP 账号。
+登录后，在私人工作台查看恢复、睡眠和训练，展开 Strength Trainer 逐组记录，再为一次训练选择分享样式。同时保留六类 WHOOP 数据和认证只读 MCP 工具。每位用户连接自己的 WHOOP 账号。
 
-**[公开试用](https://whooper.eazylee.si)** · [下载插件安装包](https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.3.1) · [插件源码](plugin) · [隐私说明](https://whooper.eazylee.si/privacy)
+**[公开试用](https://whooper.eazylee.si)** · [下载插件安装包](https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.3.2) · [插件源码](plugin) · [隐私说明](https://whooper.eazylee.si/privacy)
 
 ## 功能
+
+个人空间可设置显示名字和性别，允许留空；分享在当前页面的卡片弹层中完成。新分享保存当时的设置，旧卡片不会随资料修改。原始底图不作为公开静态文件提供，只返回合成卡片；公开可见的卡片仍可被截图。默认 Whooper 主题与 landing page 保持一致。
+
 
 | 数据 | 能力 |
 | --- | --- |
@@ -44,7 +47,7 @@
 | `journal` · 训练日志 | 以 github.io 字体排版为灵感的训练日志 |
 | `pulse` · 数字脉搏 | 以本次训练的实际指标和动作构成数据卡片 |
 
-在分享工作室的“创建页面”中，选择 **IG Post 4:5（1080 × 1350）**、**方形（1080 × 1080）**、**IG Story 9:16（1080 × 1920）**或原始长图，为两种原版呈现（`ledger`、`illustrated`）生成并预览 PNG。逐张保存后可在 Instagram 发布单图、轮播或 Story；支持的设备也可调用系统文件分享菜单，目标应用由设备决定。Story 预留上下空间，动作图鉴按完整组记录分页，图片保留素材署名及许可说明。Workout Guide 插画使用 CC BY-SA 4.0。
+在分享工作室的“创建页面”中，选择 **IG Post 4:5（1080 × 1350）**、**方形（1080 × 1080）**、**IG Story 9:16（1080 × 1920）**或原始长图，为两种原版呈现（`ledger`、`illustrated`）生成并预览 PNG。逐张保存后可在 Instagram 发布单图、轮播或 Story；支持的设备也可调用系统文件分享菜单，目标应用由设备决定。导出不添加装饰边框，纸张按画布延展，动作图鉴按完整组记录分页，图片保留素材署名及许可说明。Workout Guide 插画使用 CC BY-SA 4.0。
 
 点击“创建分享页面”前，工作室内容仅自己可见。每个链接保存独立快照，包含自定义标题、模板和主题，以及本次训练的时间、活动、时长、负荷、热量，以及可用的已完成力量动作、组数、次数、重量、单位和总训练量；不包含恢复、睡眠、心率测量、个人资料／会员身份及凭证。快照不会随后续 WHOOP 数据变化更新。任何持有链接的人均可免登录查看，30 天后失效，也可在“分享工作室 → 已分享”随时撤销；删除 Whooper 账号数据会一并删除分享。
 
@@ -62,10 +65,10 @@
 1. 打开试用地址，登录进入私人工作台。
 2. 连接 WHOOP，批准所需的只读权限。
 3. 浏览训练，在“分享工作室 → 创建页面”选择模板并预览或创建分享；在“已分享”管理链接。在账号设置连接 Strength Trainer 后可查看逐组动作数据。
-4. 如需 AI 教练，在支持 portable plugin 的客户端安装 `plugin/` 中的完整插件包。
+4. 如需通过 AI 查询数据，在支持 portable plugin 的客户端安装 `plugin/` 中的完整插件包。
 5. 用同一 Whooper 账号授权插件，先检查连接，再查询数据。
 
-MCP 地址：`https://whooper.eazylee.si/api/mcp`。认证 MCP 客户端会在初始化响应中获得教练指引，并通过 `tools/list` 发现工具；完整插件还将指引打包为 portable skill，并附带客户端元数据与品牌素材。
+MCP 地址：`https://whooper.eazylee.si/api/mcp`。认证 MCP 客户端会在初始化响应中获得数据读取与分享指引，并通过 `tools/list` 发现工具；完整插件还将指引打包为 portable skill，并附带客户端元数据与品牌素材。
 
 **试用状态：**目前使用 Clerk 开发实例；WHOOP 应用目前为 Sandbox，最多连接 10 人（2026-10-10 检查时已连接 1 人）。源码公开和提供安装包不等于已通过通用插件目录审核。真实账号验收与目录提交分别进行。
 
@@ -104,7 +107,7 @@ WHOOP 回调：`<APP_URL>/api/auth/whoop/callback`；Webhook：`<APP_URL>/api/we
 
 验证：`npm test`、`npm run lint`、`npm run build`。历史同步支持分页断点续传；每日 cron 使用服务端密钥。令牌加密存储，健康记录缓存在数据库中；查询的数据会返回发起请求的 ChatGPT、Codex 或已配置的 Muse 对话。
 
-独立社区项目，与 WHOOP 无关联或背书。教练建议用于信息参考，不提供医疗诊断。
+独立社区项目，与 WHOOP 无关联或背书。平台聚焦记录、数据与分享，不提供健身指导。
 
 ### Strength Trainer（可选）
 

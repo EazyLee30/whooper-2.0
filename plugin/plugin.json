@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "whooper",
-  "version": "0.3.1",
-  "description": "Personal WHOOP coach with recovery, sleep, strain, workout and historical data tools.",
+  "version": "0.3.2",
+  "description": "Personal WHOOP data dashboard, workout records and sharing tools.",
   "author": {
     "name": "EazyLee30"
   },
@@ -12,7 +12,7 @@
       "interface": {
         "displayName": "Whooper",
         "shortDescription": "Recovery, sleep & training",
-        "longDescription": "An independent WHOOP wellness and fitness coach. Connect your own WHOOP account to understand recovery, sleep, strain and workouts, compare personal trends, and plan training. Includes six original data domains, detail queries, daily snapshots, history coverage, and the original coaching skill. Read-only access; no changes to WHOOP records. Requires a WHOOP membership and a Whooper account. General wellness information only; not medical diagnosis or treatment. Public availability remains subject to platform review and WHOOP member limits.",
+        "longDescription": "Connect your own WHOOP account to view recovery, sleep, strain and workout records, compare recorded trends, and create personal training cards. Includes six data domains, authenticated read-only MCP tools and history coverage. Requires a WHOOP membership and a Whooper account. Public availability remains subject to platform review and WHOOP member limits.",
         "developerName": "EazyLee30",
         "category": "Health & Fitness",
         "capabilities": [
@@ -21,8 +21,8 @@
         "websiteURL": "https://whooper.eazylee.si",
         "privacyPolicyURL": "https://whooper.eazylee.si/privacy",
         "defaultPrompt": [
-          "Analyze my recovery and sleep over the last seven days",
-          "Plan my training based on today’s readiness"
+          "Show my recovery and sleep records from the last seven days",
+          "Show my latest workout with recorded sets, reps and weights"
         ],
         "brandColor": "#143F32",
         "composerIcon": "./assets/icon.png",
@@ -82,15 +82,15 @@
         }
       },
       "publication": {
-        "release_notes": "Migrate all service, MCP and privacy URLs to whooper.eazylee.si.",
+        "release_notes": "Focus Whooper on data, records and sharing; remove fitness instruction.",
         "translations": {
           "zh-CN": {
-            "subtitle": "你的恢复、睡眠与训练教练",
-            "description": "连接自己的 WHOOP 账户，分析恢复、睡眠、运动负荷和训练趋势。包含原 GPT 教练指引、六类数据及只读 MCP 工具。需要 WHOOP 会员和 Whooper 账户。提供一般健康与健身信息，不提供医疗诊断或治疗。"
+            "subtitle": "你的 WHOOP 数据与训练记录",
+            "description": "连接自己的 WHOOP 账户，查看恢复、睡眠、负荷和逐组训练记录。支持训练卡片与只读 MCP 接口。"
           },
           "zh-TW": {
-            "subtitle": "你的恢復、睡眠與訓練教練",
-            "description": "連接自己的 WHOOP 帳戶，分析恢復、睡眠、運動負荷和訓練趨勢。包含原 GPT 教練指引、六類資料及唯讀 MCP 工具。需要 WHOOP 會員和 Whooper 帳戶。提供一般健康與健身資訊，不提供醫療診斷或治療。"
+            "subtitle": "你的 WHOOP 資料與訓練紀錄",
+            "description": "連接自己的 WHOOP 帳戶，查看恢復、睡眠、負荷和逐組訓練紀錄。支援訓練卡片與唯讀 MCP 介面。"
           }
         }
       }

@@ -1,3 +1,5 @@
+import { SHEET_POSITIONS, sheetGroups } from "@/lib/ledger/groups";
+import { genderLabel } from "@/lib/profile/schema";
 import type { CSSProperties } from "react";
 import type { ShareSnapshot } from "@/lib/dashboard/types";
 import type { TemplateId } from "@/lib/presentation";
@@ -12,6 +14,7 @@ type Props = {
   snapshot: ShareSnapshot;
   template: TemplateId;
   compact?: boolean;
+  sheetToken?: string;
 };
 
 const number = (value: number) =>
@@ -244,29 +247,6 @@ function GuideCredit({ compact = false }: { compact?: boolean }) {
   );
 }
 
-const SHEET_POSITIONS = [
-  30.8, 37.05, 43.3, 49.55, 55.8, 62, 68, 73.85, 79.6, 86.05,
-];
-type SheetGroup = StrengthSet & { key: string; name: string; count: number };
-
-function sheetGroups(exercises: Exercise[]): SheetGroup[] {
-  const groups: SheetGroup[] = [];
-  for (const exercise of exercises)
-    for (const set of exercise.sets) {
-      const key = JSON.stringify([
-        exercise.id,
-        exercise.name,
-        set.weight,
-        set.units,
-        set.reps,
-      ]);
-      const previous = groups.at(-1);
-      if (previous?.key === key) previous.count += 1;
-      else groups.push({ key, name: exercise.name, ...set, count: 1 });
-    }
-  return groups;
-}
-
 function OriginalSource({
   snapshot,
   paper,
@@ -303,6 +283,7 @@ function OriginalSource({
 function Ledger({
   snapshot,
   compact,
+  sheetToken,
 }: Omit<Props, "template"> & { compact: boolean }) {
   const exercises = snapshot.strength?.exercises ?? [];
   const shown = compact ? exercises.slice(0, 2) : exercises;
@@ -336,15 +317,23 @@ function Ledger({
             key={page}
             aria-label={`${snapshot.workout.date} 训练单，第 ${page + 1} 页`}
           >
-            {/* This facsimile is intentionally rendered from the owner's original artwork. */}
+            {/* The source photograph is not exposed; this endpoint returns a composed card. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               className="wp-original-sheet-image"
-              src="/workout/exercise-list-original.png"
+              data-composed="true"
+              src={`/api/ledger-card?${sheetToken ? `share=${encodeURIComponent(sheetToken)}` : `workout=${encodeURIComponent(snapshot.workout.id)}`}&page=${page}`}
               width={1086}
               height={1448}
-              alt="克強健力學院 Exercise List 原版训练单底图"
+              alt="个人训练单卡片"
+              draggable={false}
             />
+            <span className="wp-sheet-name wp-sheet-hand">
+              {snapshot.profile?.displayName ?? ""}
+            </span>
+            <span className="wp-sheet-gender wp-sheet-hand">
+              {snapshot.profile ? genderLabel(snapshot.profile.gender) : ""}
+            </span>
             <time
               className="wp-sheet-date wp-sheet-hand"
               dateTime={snapshot.workout.date}
@@ -403,7 +392,7 @@ function Ledger({
       <More count={exercises.length - shown.length} />
       <OriginalSource snapshot={snapshot} paper />
       <p className="wp-sheet-art-note">
-        EAZY LEE 原版训练单 · 底图姓名和性别为模板装饰
+        复古训练单 · 名字和性别由分享者自行设置
       </p>
       {!compact && exercises.length > 0 && (
         <details className="wp-sheet-log">
@@ -436,9 +425,9 @@ function Illustrated({
   return (
     <article
       className={`wp wp-illustrated ${compact ? "wp-compact" : ""}`}
-      aria-label="原版动作演示"
+      aria-label="原版动作记录"
     >
-      <h3 className="wp-sr-only">{snapshot.title || "动作演示"}</h3>
+      <h3 className="wp-sr-only">{snapshot.title || "动作记录"}</h3>
       <div className="wp-original-meta">
         <span>{dateLabels(snapshot.workout.date).short}</span>
         <span>
@@ -612,10 +601,13 @@ export function WorkoutPresentation({
   snapshot,
   template,
   compact = false,
+  sheetToken,
 }: Props) {
   switch (template) {
     case "ledger":
-      return <Ledger snapshot={snapshot} compact={compact} />;
+      return (
+        <Ledger snapshot={snapshot} compact={compact} sheetToken={sheetToken} />
+      );
     case "illustrated":
       return <Illustrated snapshot={snapshot} compact={compact} />;
     case "journal":

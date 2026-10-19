@@ -10,3 +10,5 @@ dist/
 
 # Local product planning
 /docs/PRODUCT_PLAN.local.md
+
+/.private-assets/

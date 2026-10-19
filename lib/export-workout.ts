@@ -4,6 +4,7 @@ import {
   imageBodyHeight,
   type ImageFormat,
 } from "./image-formats";
+import { IMAGE_FORMATS } from "./image-formats";
 type ImageSink = (canvas: HTMLCanvasElement, filename: string) => Promise<void>;
 
 type Ink = {
@@ -224,38 +225,23 @@ async function exportLedger(
     );
     if (!original) throw new Error("训练单底图尚未准备好。");
     await original.decode();
+    const artwork = original;
+    const originalWidth = original.naturalWidth,
+      originalHeight = original.naturalHeight;
     const bounds = sheet.getBoundingClientRect();
     if (bounds.width <= 0) throw new Error("请打开完整预览后再保存图片。");
-    // The 1086 × 1448 artwork remains at its original resolution. A separate
-    // footer retains unit and template-identity context outside the photograph.
-    const { canvas, context } = makeCanvas(
-      original.naturalWidth,
-      original.naturalHeight + 108,
-    );
+    // Preserve the original card proportions without an appended footer or frame.
+    const { canvas, context } = makeCanvas(originalWidth, originalHeight);
     context.fillStyle = "#f3ecd9";
     context.fillRect(0, 0, canvas.width, canvas.height);
-    context.drawImage(original, 0, 0);
-    const ratio = original.naturalWidth / bounds.width;
-    sheet
-      .querySelectorAll<HTMLElement>(
-        ".wp-sheet-date, .wp-sheet-entry > span, .wp-sheet-empty, .wp-sheet-page",
-      )
-      .forEach((element) => drawSheetText(context, element, bounds, ratio));
-    const unitCaption =
-      cleanText(
-        root.querySelector(".wp-original-source > div:first-child small"),
-      ) ||
-      "WEIGHT IN LBS · KG × 2.2046 · 0 = ZERO RECORDED LOAD · 未记录 = UNKNOWN";
-    const identityCaption = cleanText(root.querySelector(".wp-sheet-art-note"));
-    const footerTop = original.naturalHeight + 18;
-    setFont(context, 13);
-    const captions = [
-      ...wrap(context, unitCaption, canvas.width - 64),
-      ...wrap(context, identityCaption, canvas.width - 64),
-    ];
-    captions.forEach((line, lineIndex) =>
-      text(context, line, 32, footerTop + lineIndex * 19, 13, "#74624c"),
-    );
+    context.drawImage(artwork, 0, 0);
+    const ratio = originalWidth / bounds.width;
+    if (!original.dataset.composed)
+      sheet
+        .querySelectorAll<HTMLElement>(
+          ".wp-sheet-name, .wp-sheet-gender, .wp-sheet-date, .wp-sheet-entry > span, .wp-sheet-empty, .wp-sheet-page",
+        )
+        .forEach((element) => drawSheetText(context, element, bounds, ratio));
     await output(
       canvas,
       `whooper-workout-${date}-ledger${sheets.length > 1 ? `-${index + 1}` : ""}.png`,
@@ -380,7 +366,7 @@ async function exportIllustrated(
   await document.fonts.ready;
   const ink = colors(root);
   const measurement = makeCanvas(WIDTH, 1);
-  const bodyHeight = imageBodyHeight(format, HEADER, FOOTER);
+  const bodyHeight = imageBodyHeight(format, HEADER, FOOTER) - CARD_GAP;
   const cards = await movementCards(root, measurement.context, ink, bodyHeight);
   measurement.canvas.width = measurement.canvas.height = 0;
   const pages: MovementCard[][] = [[]];
@@ -412,7 +398,7 @@ async function exportIllustrated(
     );
     const { canvas, context } = makeCanvas(
       WIDTH,
-      HEADER + (body || 250) + FOOTER,
+      IMAGE_FORMATS[format].height ?? HEADER + (body || 250) + FOOTER,
     );
     context.fillStyle = ink.background;
     context.fillRect(0, 0, canvas.width, canvas.height);
@@ -449,7 +435,7 @@ async function exportIllustrated(
     for (const card of page) {
       context.strokeStyle = ink.line;
       context.lineWidth = 2;
-      context.strokeRect(60, y, 960, card.height);
+
       card.title.forEach((line, index) =>
         text(context, line, 86, y + 24 + index * 36, 28, ink.text),
       );
@@ -540,6 +526,16 @@ export async function prepareWorkoutImages(
     context.fillStyle =
       template === "ledger" ? "#f3ecd9" : colors(root).background;
     context.fillRect(0, 0, canvas.width, canvas.height);
+    if (template === "ledger" && format !== "original") {
+      // Continue the paper texture to the format edge, without a frame or mat.
+      const tile = makeCanvas(48, 48);
+      tile.context.drawImage(source, 470, 240, 48, 48, 0, 0, 48, 48);
+      const pattern = context.createPattern(tile.canvas, "repeat");
+      if (pattern) {
+        context.fillStyle = pattern;
+        context.fillRect(0, 0, canvas.width, canvas.height);
+      }
+    }
     context.drawImage(
       source,
       placement.x,

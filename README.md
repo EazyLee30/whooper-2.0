@@ -2,7 +2,7 @@
 <p align="center">
 <a href="https://whooper.eazylee.si"><img src="https://img.shields.io/badge/Public_trial-Visit-143F32?style=flat-square" alt="Public trial"></a>
 <a href="https://github.com/EazyLee30/whooper-2.0/actions/workflows/checks.yml"><img src="https://github.com/EazyLee30/whooper-2.0/actions/workflows/checks.yml/badge.svg" alt="Checks"></a>
-<img src="https://img.shields.io/badge/Plugin-v0.2.1-8EDDA8?style=flat-square" alt="Plugin v0.2.1">
+<img src="https://img.shields.io/badge/Plugin-v0.3.2-8EDDA8?style=flat-square" alt="Plugin v0.3.2">
 <img src="https://img.shields.io/badge/WHOOP_API-v2-143F32?style=flat-square" alt="WHOOP API v2">
 <img src="https://img.shields.io/badge/MCP-Streamable_HTTP-FF735D?style=flat-square" alt="MCP Streamable HTTP">
 </p>
@@ -10,11 +10,11 @@
 
 # Whooper
 
-Your personal WHOOP dashboard, workout journal and share studio — alongside a coaching plugin for ChatGPT and Codex, with authenticated MCP access from Muse.
+Your personal WHOOP dashboard, workout journal and share studio — alongside a data plugin for ChatGPT and Codex, with authenticated MCP access from Muse.
 
-Sign in to see recovery, sleep and training in one private workspace, inspect Strength Trainer sets, and choose how a workout becomes a shareable page. Whooper also carries forward the original GPT's coaching instructions and all six WHOOP data domains through authenticated, read-only MCP tools. Each person connects their own WHOOP account.
+Sign in to see recovery, sleep and training in one private workspace, inspect Strength Trainer sets, and choose how a workout becomes a shareable page. Whooper also carries forward all six WHOOP data domains through authenticated, read-only MCP tools. Each person connects their own WHOOP account.
 
-**[Open the public trial](https://whooper.eazylee.si)** · [Download plugin](https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.3.1) · [Plugin source](plugin) · [Privacy](https://whooper.eazylee.si/privacy)
+**[Open the public trial](https://whooper.eazylee.si)** · [Download plugin](https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.3.2) · [Plugin source](plugin) · [Privacy](https://whooper.eazylee.si/privacy)
 
 ## What you can do
 
@@ -27,15 +27,17 @@ Sign in to see recovery, sleep and training in one private workspace, inspect St
 | Daily picture | Link recovery, sleep and workouts using cycle IDs and your timezone |
 | History | Cursor pagination, resumable sync and cache coverage checks |
 
-Ask: “Compare my recovery and sleep over the last seven days.” Or: “Given today's readiness, how should I train?” Missing data stays missing; pending scores are never silently turned into zero.
+Ask: “Compare my recovery and sleep over the last seven days.” Or: “Show the sets and loads from my latest workout.” Missing data stays missing; pending scores are never silently turned into zero.
 
 ## Dashboard and share studio
 
+Sharing opens a card dialog in the current workspace. Set your display name and optional gender in **Personal space** (`/settings/connections`); newly generated cards use those preferences, while existing shares retain their original snapshot. The original photograph is not served as a public file: only composed cards are delivered. Publicly visible cards can still be captured. Whooper focuses on data and records, without fitness instruction.
+
 The home page introduces Whooper to visitors. Signing in opens the private `/dashboard`; the dashboard, workout details and studio require your account. Choose a date, inspect the latest seven days of activity, and select a workout for its recorded sets, reps and loads. Strength Trainer details require the optional connection described below. Empty accounts show clearly labeled template examples; examples cannot be published as your workouts.
 
-The workspace has three destinations: **Overview** shows daily metrics, the seven-day rhythm and the three most recent workout summaries; **Workouts** contains the complete list for the selected period and session details; **Share studio** has **Create page** (`创建页面`) and **Shared** (`已分享`) tabs for composing pages and managing existing links. The theme picker stays in the top bar.
+The workspace has three destinations: **Overview** shows daily metrics, the seven-day rhythm and the three most recent workout summaries; **Workouts** contains the complete list for the selected period and session details; **Share studio** has **Create card** (`制作分享卡片`) and **Shared** (`已分享`) tabs for composing pages and managing existing links. The theme picker stays in the top bar.
 
-The theme picker brings over eight palettes from the personal github.io site: **Flexoki, Monochrome, Latte, Tokyo Night, Gruvbox, Nord, Rosé Pine and Matrix**. Theme and presentation are separate choices.
+The theme picker brings over eight palettes from the personal github.io site: **Flexoki, Monochrome, Latte, Tokyo Night, Gruvbox, Nord, Rosé Pine and Matrix**. The default Whooper palette matches the landing page. Theme and presentation are separate choices.
 
 | Template | Presentation |
 | --- | --- |
@@ -44,7 +46,7 @@ The theme picker brings over eight palettes from the personal github.io site: **
 | `journal` · Training journal | An editorial workout log inspired by the github.io typography |
 | `pulse` · Performance card | A compact presentation of the session's recorded metrics and exercises |
 
-In the studio’s **Create page** tab, choose **IG Post 4:5 (1080 × 1350)**, **square (1080 × 1080)**, **IG Story 9:16 (1080 × 1920)** or the original image size, then generate and preview PNGs for the two original presentations (`ledger`, `illustrated`). Download each image for an Instagram post, carousel or Story; supported devices also offer a system file-sharing menu. Available target apps depend on the device. Story exports reserve top and bottom space, movement cards paginate by complete set rows, and artwork credits stay on the images. Workout Guide illustrations use CC BY-SA 4.0.
+In the studio’s **Create card** dialog, choose **IG Post 4:5 (1080 × 1350)**, **square (1080 × 1080)**, **IG Story 9:16 (1080 × 1920)** or the original image size, then generate and preview PNGs for the two original presentations (`ledger`, `illustrated`). Download each image for an Instagram post, carousel or Story; supported devices also offer a system file-sharing menu. Available target apps depend on the device. Exports add no decorative frame; paper formats continue the paper texture to the canvas edge, movement cards paginate by complete set rows, and artwork credits stay on the images. Workout Guide illustrations use CC BY-SA 4.0.
 
 The studio stays private until you select **Create share page**. Each new link stores an independent snapshot with your title, template and theme, workout timing, activity, duration, strain and calories, plus available completed strength exercises, sets, reps, loads, units and total volume. It excludes recovery, sleep, heart-rate measurements, profile/member identity and credentials. A snapshot does not update with later WHOOP changes. Anyone holding its link can view it without signing in until it expires after 30 days or you revoke it from **Share studio → Shared**. Deleting your Whooper account data also deletes its shares.
 
@@ -62,10 +64,10 @@ The studio stays private until you select **Create share page**. Each new link s
 1. Open the trial and sign in to your private dashboard.
 2. Connect WHOOP and approve the requested read scopes.
 3. Browse your workouts, choose a template in the share studio, and preview or create a share page. Connect Strength Trainer in account settings for individual exercise sets.
-4. For AI coaching, install the package in a client that supports portable plugins. The package lives in `plugin/`; it contains `plugin.json`, `mcp.json`, the coaching skill and brand assets.
+4. For AI data queries, install the package in a client that supports portable plugins. The package lives in `plugin/`; it contains `plugin.json`, `mcp.json`, the data skill and brand assets.
 5. Authorize the plugin with the same Whooper account. Ask it to check your connection before requesting health data.
 
-The MCP endpoint is `https://whooper.eazylee.si/api/mcp`. Authenticated MCP clients receive coaching guidance in the initialization response and discover tools through `tools/list`; the complete plugin also packages that guidance as a portable skill with client metadata and brand assets.
+The MCP endpoint is `https://whooper.eazylee.si/api/mcp`. Authenticated MCP clients receive data and sharing instructions in the initialization response and discover tools through `tools/list`; the complete plugin also packages that guidance as a portable skill with client metadata and brand assets.
 
 **Trial status:** this deployment uses a Clerk development instance. The WHOOP app is currently Sandbox: up to 10 connected members (1 connected when checked on October 10, 2026). Public source and a downloadable package do not mean approval or listing in the universal plugin directory. Real-account acceptance testing and directory submission are tracked separately.
 

@@ -1,6 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  outputFileTracingIncludes: {
+    "/api/ledger-card": [
+      "./assets/ledger-paper.enc",
+      "./assets/NotoSansCJKsc-Regular.otf",
+      "./public/workout/fonts/Kalam-Regular.ttf",
+    ],
+  },
   async headers() {
     return [
       {

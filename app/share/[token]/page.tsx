@@ -39,7 +39,7 @@ export default async function SharedWorkoutPage({
           {snapshot.workout.date.replaceAll("-", ".")} · {snapshot.workout.name}{" "}
           · 训练快照
         </p>
-        <WorkoutPresentation snapshot={snapshot} template={share.template} />
+        <WorkoutPresentation snapshot={snapshot} template={share.template} sheetToken={share.token} />
         <div className="share-toolbar">
           <span>这张页面记录了分享时的训练数据。</span>
           <span>有效至 {share.expiresAt.slice(0, 10)} · 分享者可随时撤销</span>

@@ -25,6 +25,8 @@ export default clerkMiddleware(async (auth, req) => {
   // These handlers authenticate at the resource and return a JSON 401. Clerk's
   // protect() intentionally masks unauthenticated API requests as a 404.
   const resourceAuthenticates =
+    path === "/api/ledger-card" ||
+    path === "/api/profile" ||
     path === "/api/dashboard" ||
     path.startsWith("/api/dashboard/") ||
     path === "/api/shares" ||

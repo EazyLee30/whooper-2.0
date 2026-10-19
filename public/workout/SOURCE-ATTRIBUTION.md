@@ -16,12 +16,15 @@ see Workout Guide's `ATTRIBUTION.md` and `manifest.json` for details.
 
 ## Original training sheet
 
-`exercise-list-original.png` is the exact image supplied by the site owner on
-2026-10-15. SHA-256: `6838b4e690021406d106d33121e227515f4b8f3ec34461e53f70fd46aa55d19d`.
-No crop, retouch, filter, reconstruction or replacement of its existing handwriting.
-New dates and training values are separate HTML overlays in blank areas. Kalam
-Regular is used only for newly added values; the embedded EAZY LEE / M remain pixels
-in the owner's image. Font license is bundled in `assets/fonts/training-hand/OFL.txt`.
+The owner supplied the original photograph. Its public static copy has been removed.
+ImageGen restored only the handwritten name and gender fields to blank paper,
+preserving the original photograph's layout and texture. The restored artwork is
+stored encrypted under `assets/ledger-paper.enc`; it is not a public asset.
+`/api/ledger-card` returns a composed training card for the authenticated owner or
+an active, unexpired share token. Display name and gender are opt-in profile values.
+Kalam supplies Latin handwriting; Noto Sans CJK supplies Chinese glyphs. Font
+licenses are bundled with the corresponding assets. Visible composed cards remain
+capturable; this does not promise screenshot prevention.
 
 
 `guide/` bundles the three unmodified SVG frames for bicep-curl, pull-up,

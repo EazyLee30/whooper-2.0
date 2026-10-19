@@ -1,8 +1,8 @@
 export const IMAGE_FORMATS = {
   original: { label: "原始长图", width: 1080, height: null, insetY: 0 },
-  post: { label: "IG Post · 4:5", width: 1080, height: 1350, insetY: 32 },
-  square: { label: "IG Post · 1:1", width: 1080, height: 1080, insetY: 32 },
-  story: { label: "IG Story · 9:16", width: 1080, height: 1920, insetY: 250 },
+  post: { label: "IG Post · 4:5", width: 1080, height: 1350, insetY: 0 },
+  square: { label: "IG Post · 1:1", width: 1080, height: 1080, insetY: 0 },
+  story: { label: "IG Story · 9:16", width: 1080, height: 1920, insetY: 0 },
 } as const;
 export type ImageFormat = keyof typeof IMAGE_FORMATS;
 
@@ -15,7 +15,7 @@ export function imagePlacement(
   const target = IMAGE_FORMATS[format];
   if (!target.height)
     return { width, height, x: 0, y: 0, drawWidth: width, drawHeight: height };
-  const insetX = 24;
+  const insetX = 0;
   const scale = Math.min(
     (target.width - insetX * 2) / width,
     (target.height - target.insetY * 2) / height,

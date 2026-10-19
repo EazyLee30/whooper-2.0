@@ -1072,3 +1072,34 @@
     break-inside: avoid;
   }
 }
+.wp-sheet-name,
+.wp-sheet-gender {
+  position: absolute;
+  top: 19.5%;
+  height: 3.2%;
+  display: flex;
+  align-items: center;
+  font-size: 3.8cqw;
+  line-height: 1;
+}
+.wp-sheet-name {
+  left: 16%;
+  width: 32%;
+  font-size: clamp(8px, 3.3cqw, 36px);
+  overflow: hidden;
+  white-space: nowrap;
+}
+.wp-sheet-gender {
+  left: 58%;
+  width: 6%;
+  justify-content: center;
+}
+/* A readable DOM log remains available; the delivered card already contains ink. */
+.wp-original-sheet:has([data-composed]) .wp-sheet-name,
+.wp-original-sheet:has([data-composed]) .wp-sheet-gender,
+.wp-original-sheet:has([data-composed]) .wp-sheet-date,
+.wp-original-sheet:has([data-composed]) .wp-sheet-entries,
+.wp-original-sheet:has([data-composed]) .wp-sheet-empty,
+.wp-original-sheet:has([data-composed]) .wp-sheet-page {
+  opacity: 0;
+}
