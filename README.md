@@ -31,7 +31,6 @@ Ask: “Compare my recovery and sleep over the last seven days.” Or: “Given 
 
 ## Dashboard and share studio
 
-The [product optimization plan](docs/PRODUCT_PLAN.md) describes the proposed interactive UI, training culture, community template Store and commercialization phases.
 
 The home page introduces Whooper to visitors. Signing in opens the private `/dashboard`; the dashboard, workout details and studio require your account. Choose a date, inspect the latest seven days of activity, and select a workout for its recorded sets, reps and loads. Strength Trainer details require the optional connection described below. Empty accounts show clearly labeled template examples; examples cannot be published as your workouts.
 

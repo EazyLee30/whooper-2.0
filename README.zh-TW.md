@@ -10,7 +10,6 @@
 
 # Whooper
 
-[產品優化與商業化計劃](docs/PRODUCT_PLAN.md)：互動動效、催練與薄肌文化、使用者共建範本 Store 與分階段商業化。
 
 你的 WHOOP 資料看板、訓練日誌與分享工作室，同時提供 ChatGPT 和 Codex 教練外掛，並支援 Muse 透過認證 MCP 接入。
 

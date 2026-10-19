@@ -7,3 +7,6 @@ generated/
 *.tsbuildinfo
 .env*.local
 dist/
+
+# Local product planning
+/docs/PRODUCT_PLAN.local.md
