@@ -1,22 +1,24 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from 'next/font/local';
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 
-const geistSans = Geist({
+const geistSans = localFont({
+  src: '../public/workout/fonts/geist.woff2',
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  display: 'swap',
 });
 
-const geistMono = Geist_Mono({
+const geistMono = localFont({
+  src: '../public/workout/fonts/jetbrains-mono.woff2',
   variable: "--font-geist-mono",
-  subsets: ["latin"],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
   title: "Whooper — Your recovery. A clearer tomorrow.",
   description:
-    "Bring your WHOOP recovery, sleep and training context to your AI coach.",
+    "Your WHOOP dashboard, workout journal and share studio. Bring your recovery, sleep and training context to your AI coach.",
 };
 
 export default function RootLayout({

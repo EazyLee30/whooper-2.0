@@ -10,9 +10,9 @@
 
 # Whooper
 
-Your personal recovery, sleep and training coach — a plugin for ChatGPT and Codex, with authenticated MCP access from Muse.
+Your personal WHOOP dashboard, workout journal and share studio — alongside a coaching plugin for ChatGPT and Codex, with authenticated MCP access from Muse.
 
-Whooper carries forward the original GPT's coaching instructions and all six WHOOP data domains. The plugin combines a coaching skill with authenticated, read-only MCP tools. Each person signs in and connects their own WHOOP account.
+Sign in to see recovery, sleep and training in one private workspace, inspect Strength Trainer sets, and choose how a workout becomes a shareable page. Whooper also carries forward the original GPT's coaching instructions and all six WHOOP data domains through authenticated, read-only MCP tools. Each person connects their own WHOOP account.
 
 **[Open the public trial](https://whooper.eazylee.si)** · [Download plugin](https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.2.1) · [Plugin source](plugin) · [Privacy](https://whooper.eazylee.si/privacy)
 
@@ -29,12 +29,39 @@ Whooper carries forward the original GPT's coaching instructions and all six WHO
 
 Ask: “Compare my recovery and sleep over the last seven days.” Or: “Given today's readiness, how should I train?” Missing data stays missing; pending scores are never silently turned into zero.
 
+## Dashboard and share studio
+
+The home page introduces Whooper to visitors. Signing in opens the private `/dashboard`; the dashboard, workout details and studio require your account. Choose a date, inspect the latest seven days of activity, and select a workout for its recorded sets, reps and loads. Strength Trainer details require the optional connection described below. Empty accounts show clearly labeled template examples; examples cannot be published as your workouts.
+
+The theme picker brings over eight palettes from the personal github.io site: **Flexoki, Monochrome, Latte, Tokyo Night, Gruvbox, Nord, Rosé Pine and Matrix**. Theme and presentation are separate choices.
+
+| Template | Presentation |
+| --- | --- |
+| `ledger` · Training ledger | Original handwritten training-sheet artwork and layout from the personal workout page, with dates and exercise values overlaid on the paper |
+| `illustrated` · Movement guide | Original workout movement-card layout with three-frame [Workout Guide](https://github.com/bryllim/workout-guide) illustrations and individual sets |
+| `journal` · Training journal | An editorial workout log inspired by the github.io typography |
+| `pulse` · Performance card | A compact presentation of the session's recorded metrics and exercises |
+
+Open the full preview to export the two original presentations (`ledger` and `illustrated`) as PNGs. Longer training sheets are paginated. Artwork credit and license notices are preserved; Workout Guide illustrations use CC BY-SA 4.0.
+
+The studio stays private until you select **Create share page**. Each new link stores an independent snapshot with your title, template and theme, workout timing, activity, duration, strain and calories, plus available completed strength exercises, sets, reps, loads, units and total volume. It excludes recovery, sleep, heart-rate measurements, profile/member identity and credentials. A snapshot does not update with later WHOOP changes. Anyone holding its link can view it without signing in until it expires after 30 days or you revoke it from **My links**. Deleting your Whooper account data also deletes its shares.
+
+| Endpoint | Access and purpose |
+| --- | --- |
+| `GET /api/dashboard?date=YYYY-MM-DD` | Signed in: daily metrics and seven-day workout context; date is optional |
+| `GET /api/dashboard/strength?workout=ID` | Signed in: completed strength details for an owned workout |
+| `GET /api/shares` | Signed in: list your share links |
+| `POST /api/shares` | Signed in: create a snapshot from `workoutId`, `template`, `theme` and `title` |
+| `DELETE /api/shares/ID` | Signed in: revoke one of your links |
+| `GET /share/TOKEN` | Public read-only page for an active snapshot |
+
 ## Try it
 
-1. Open the trial and sign in.
+1. Open the trial and sign in to your private dashboard.
 2. Connect WHOOP and approve the requested read scopes.
-3. Install the package in a client that supports portable plugins. The package lives in `plugin/`; it contains `plugin.json`, `mcp.json`, the coaching skill and brand assets.
-4. Authorize the plugin with the same Whooper account. Ask it to check your connection before requesting health data.
+3. Browse your workouts, choose a template in the share studio, and preview or create a share page. Connect Strength Trainer in account settings for individual exercise sets.
+4. For AI coaching, install the package in a client that supports portable plugins. The package lives in `plugin/`; it contains `plugin.json`, `mcp.json`, the coaching skill and brand assets.
+5. Authorize the plugin with the same Whooper account. Ask it to check your connection before requesting health data.
 
 The MCP endpoint is `https://whooper.eazylee.si/api/mcp`. Authenticated MCP clients receive coaching guidance in the initialization response and discover tools through `tools/list`; the complete plugin also packages that guidance as a portable skill with client metadata and brand assets.
 
@@ -61,6 +88,8 @@ If Clerk reports a redirect mismatch, check the exact callback in its allowlist.
 
 Node.js 24, PostgreSQL, a Clerk OAuth application and a WHOOP developer application are required.
 
+Before deploying the dashboard and sharing features, apply all database migrations, including **`0004_training_shares`**, with `npx prisma migrate deploy`. This migration creates the snapshot table and its account-deletion cascade. Keep `NEXT_PUBLIC_APP_URL` set to your deployment's canonical origin so generated share links use the right host.
+
 ```sh
 npm ci
 cp .env.example .env.local
@@ -86,8 +115,12 @@ flowchart LR
   User --> Clerk[Clerk sign-in + OAuth]
   User --> WHOOP[WHOOP consent]
   Client[ChatGPT / Codex / Muse MCP helper] --> MCP[Authenticated MCP tools]
+  User --> Dashboard[Private dashboard + share studio]
+  Dashboard --> DB[(PostgreSQL)]
+  Dashboard --> Share[Explicit 30-day workout snapshot]
+  Share --> Public[Public token link]
   MCP --> API[WHOOP v2 API]
-  MCP --> DB[(PostgreSQL)]
+  MCP --> DB
   WHOOP --> Sync[Webhooks + resumable sync]
   Sync --> DB
 ```

@@ -10,9 +10,9 @@
 
 # Whooper
 
-你的恢復、睡眠與訓練教練，提供 ChatGPT 和 Codex 外掛，並支援 Muse 透過認證 MCP 接入。
+你的 WHOOP 資料看板、訓練日誌與分享頁面庫，同時提供 ChatGPT 和 Codex 教練外掛，並支援 Muse 透過認證 MCP 接入。
 
-保留原 GPT 的完整教練指令與六類 WHOOP 資料功能，結合唯讀 MCP 工具、詳細資料查詢、每日快照與歷史涵蓋範圍檢查。每位使用者登入自己的帳號並授權自己的 WHOOP。
+登入後，在私人工作台查看恢復、睡眠及訓練，展開 Strength Trainer 逐組紀錄，再為一次訓練選擇分享樣式。同時保留原 GPT 的完整教練指令、六類 WHOOP 資料與認證唯讀 MCP 工具。每位使用者連接自己的 WHOOP 帳號。
 
 **[公開試用](https://whooper.eazylee.si)** · [下載外掛安裝包](https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.2.1) · [外掛原始碼](plugin) · [隱私說明](https://whooper.eazylee.si/privacy)
 
@@ -29,12 +29,39 @@
 
 例如：「分析我最近七天的恢復和睡眠」「依照今天的狀態安排訓練」。缺漏資料保持缺漏，尚未完成的評分不會被當成零。
 
+## 資料看板與分享頁面庫
+
+未登入時首頁展示產品介紹；登入後進入私人 `/dashboard`。看板、訓練明細及分享工作室均須登入。可切換日期、查看近七天活動，並選擇訓練查看已記錄的組數、次數與重量；力量明細需要下方介紹的選用 Strength Trainer 連接。沒有訓練資料時，模板會清楚標示為範例，範例不能作為你的訓練發布。
+
+主題選擇器沿用個人 github.io 的八套配色：**Flexoki、Monochrome、Latte、Tokyo Night、Gruvbox、Nord、Rosé Pine、Matrix**。配色與呈現模板可分別選擇。
+
+| 模板 | 呈現方式 |
+| --- | --- |
+| `ledger` · 功夫訓練單 | 直接沿用個人 workout 頁的原版手寫訓練單底圖與排版，在紙上疊加日期、動作及訓練資料 |
+| `illustrated` · 動作圖鑑 | 沿用原版動作卡片配置，搭配 [Workout Guide](https://github.com/bryllim/workout-guide) 三幀動作插畫與逐組紀錄 |
+| `journal` · 訓練日誌 | 以 github.io 字體排版為靈感的訓練日誌 |
+| `pulse` · 數字脈搏 | 以本次訓練的實際指標與動作構成資料卡片 |
+
+在完整預覽中可將兩種原版呈現（`ledger`、`illustrated`）匯出為 PNG；較長訓練單自動分頁。保留插畫來源及授權說明，Workout Guide 插畫使用 CC BY-SA 4.0。
+
+點選「建立分享頁面」前，工作室內容僅自己可見。每個連結儲存獨立快照，包含自訂標題、模板及主題，以及本次訓練的時間、活動、時長、負荷、熱量，以及可用的已完成力量動作、組數、次數、重量、單位和總訓練量；不包含恢復、睡眠、心率測量、個人資料／會員身分及憑證。快照不會隨後續 WHOOP 資料變化更新。任何持有連結的人均可免登入查看，30 天後失效，也可在「我的分享」隨時撤銷；刪除 Whooper 帳號資料會一併刪除分享。
+
+| 介面 | 存取與用途 |
+| --- | --- |
+| `GET /api/dashboard?date=YYYY-MM-DD` | 須登入：當天指標及近七天訓練，日期可省略 |
+| `GET /api/dashboard/strength?workout=ID` | 須登入：自己某次訓練的已完成力量明細 |
+| `GET /api/shares` | 須登入：列出自己的分享連結 |
+| `POST /api/shares` | 須登入：透過 `workoutId`、`template`、`theme`、`title` 建立快照 |
+| `DELETE /api/shares/ID` | 須登入：撤銷自己的分享連結 |
+| `GET /share/TOKEN` | 公開：有效訓練快照的唯讀頁面 |
+
 ## 使用
 
-1. 開啟試用網址並登入。
+1. 開啟試用網址，登入進入私人工作台。
 2. 連接 WHOOP，批准所需的唯讀權限。
-3. 在支援 portable plugin 的用戶端安裝 `plugin/` 中的完整外掛套件。
-4. 用同一 Whooper 帳號授權外掛，先檢查連線，再查詢資料。
+3. 瀏覽訓練，在分享頁面庫選擇模板並預覽或建立分享；在帳號設定連接 Strength Trainer 後可查看逐組動作資料。
+4. 如需 AI 教練，在支援 portable plugin 的用戶端安裝 `plugin/` 中的完整外掛套件。
+5. 用同一 Whooper 帳號授權外掛，先檢查連線，再查詢資料。
 
 MCP 網址：`https://whooper.eazylee.si/api/mcp`。認證 MCP 用戶端會在初始化回應中取得教練指引，並透過 `tools/list` 探索工具；完整外掛還將指引封裝為 portable skill，並附帶用戶端中繼資料與品牌素材。
 
@@ -60,6 +87,8 @@ Muse 可透過同一認證唯讀 MCP 介面查詢 Whooper。**2026-10-15 已驗�
 ## 自行部署
 
 需要 Node.js 24、PostgreSQL、Clerk OAuth 應用程式及 WHOOP 開發者應用程式。
+
+發布看板與分享功能前，務必執行 `npx prisma migrate deploy` 套用全部遷移，包含 **`0004_training_shares`**。此遷移建立訓練快照資料表，並在刪除帳號資料時串聯刪除分享。將 `NEXT_PUBLIC_APP_URL` 設為部署的正式來源網址，讓產生的分享連結使用正確網域。
 
 ```sh
 npm ci

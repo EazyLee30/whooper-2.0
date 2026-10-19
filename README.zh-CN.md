@@ -10,9 +10,9 @@
 
 # Whooper
 
-你的恢复、睡眠与训练教练，提供 ChatGPT 和 Codex 插件，并支持 Muse 通过认证 MCP 接入。
+你的 WHOOP 数据看板、训练日志与分享页面库，同时提供 ChatGPT 和 Codex 教练插件，并支持 Muse 通过认证 MCP 接入。
 
-保留原 GPT 的完整教练指令和六类 WHOOP 数据功能，结合只读 MCP 工具、详情查询、每日快照与历史覆盖检查。每位用户登录自己的账号并授权自己的 WHOOP。
+登录后，在私人工作台查看恢复、睡眠和训练，展开 Strength Trainer 逐组记录，再为一次训练选择分享样式。同时保留原 GPT 的完整教练指令、六类 WHOOP 数据和认证只读 MCP 工具。每位用户连接自己的 WHOOP 账号。
 
 **[公开试用](https://whooper.eazylee.si)** · [下载插件安装包](https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.2.1) · [插件源码](plugin) · [隐私说明](https://whooper.eazylee.si/privacy)
 
@@ -29,12 +29,39 @@
 
 例如：“分析我最近七天的恢复和睡眠”“结合今天的状态安排训练”。缺失数据保持缺失，未完成评分不会被当成零。
 
+## 数据看板与分享页面库
+
+未登录时首页展示产品介绍；登录后进入私人 `/dashboard`。看板、训练明细和分享工作室均需登录。可切换日期、查看近七天活动，并选择训练查看已记录的组数、次数和重量；力量明细需要下方介绍的可选 Strength Trainer 连接。没有训练数据时，模板会明确标为示例，示例不能作为你的训练发布。
+
+主题选择器沿用个人 github.io 的八套配色：**Flexoki、Monochrome、Latte、Tokyo Night、Gruvbox、Nord、Rosé Pine、Matrix**。配色和呈现模板可分别选择。
+
+| 模板 | 呈现方式 |
+| --- | --- |
+| `ledger` · 功夫训练单 | 直接沿用个人 workout 页的原版手写训练单底图与排版，在纸上叠加日期、动作及训练数据 |
+| `illustrated` · 动作图鉴 | 沿用原版动作卡片布局，搭配 [Workout Guide](https://github.com/bryllim/workout-guide) 三帧动作插画与逐组记录 |
+| `journal` · 训练日志 | 以 github.io 字体排版为灵感的训练日志 |
+| `pulse` · 数字脉搏 | 以本次训练的实际指标和动作构成数据卡片 |
+
+在完整预览中可将两种原版呈现（`ledger`、`illustrated`）导出为 PNG；较长训练单自动分页。保留插画来源及许可说明，Workout Guide 插画使用 CC BY-SA 4.0。
+
+点击“创建分享页面”前，工作室内容仅自己可见。每个链接保存独立快照，包含自定义标题、模板和主题，以及本次训练的时间、活动、时长、负荷、热量，以及可用的已完成力量动作、组数、次数、重量、单位和总训练量；不包含恢复、睡眠、心率测量、个人资料／会员身份及凭证。快照不会随后续 WHOOP 数据变化更新。任何持有链接的人均可免登录查看，30 天后失效，也可在“我的分享”随时撤销；删除 Whooper 账号数据会一并删除分享。
+
+| 接口 | 访问与用途 |
+| --- | --- |
+| `GET /api/dashboard?date=YYYY-MM-DD` | 需登录：当天指标及近七天训练，日期可省略 |
+| `GET /api/dashboard/strength?workout=ID` | 需登录：自己某次训练的已完成力量明细 |
+| `GET /api/shares` | 需登录：列出自己的分享链接 |
+| `POST /api/shares` | 需登录：通过 `workoutId`、`template`、`theme`、`title` 创建快照 |
+| `DELETE /api/shares/ID` | 需登录：撤销自己的分享链接 |
+| `GET /share/TOKEN` | 公开：有效训练快照的只读页面 |
+
 ## 使用
 
-1. 打开试用地址并登录。
+1. 打开试用地址，登录进入私人工作台。
 2. 连接 WHOOP，批准所需的只读权限。
-3. 在支持 portable plugin 的客户端安装 `plugin/` 中的完整插件包。
-4. 用同一 Whooper 账号授权插件，先检查连接，再查询数据。
+3. 浏览训练，在分享页面库选择模板并预览或创建分享；在账号设置连接 Strength Trainer 后可查看逐组动作数据。
+4. 如需 AI 教练，在支持 portable plugin 的客户端安装 `plugin/` 中的完整插件包。
+5. 用同一 Whooper 账号授权插件，先检查连接，再查询数据。
 
 MCP 地址：`https://whooper.eazylee.si/api/mcp`。认证 MCP 客户端会在初始化响应中获得教练指引，并通过 `tools/list` 发现工具；完整插件还将指引打包为 portable skill，并附带客户端元数据与品牌素材。
 
@@ -60,6 +87,8 @@ Muse 可通过同一认证只读 MCP 接口查询 Whooper。**2026-10-15 已验�
 ## 自行部署
 
 需要 Node.js 24、PostgreSQL、Clerk OAuth 应用和 WHOOP 开发者应用。
+
+发布看板和分享功能前，务必运行 `npx prisma migrate deploy` 应用全部迁移，包含 **`0004_training_shares`**。此迁移创建训练快照表，并在删除账号数据时级联删除分享。将 `NEXT_PUBLIC_APP_URL` 设置为部署的正式源地址，使生成的分享链接使用正确域名。
 
 ```sh
 npm ci

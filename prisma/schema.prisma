@@ -18,6 +18,7 @@ model User {
   createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   connections WhoopConnection[]
+  trainingShares TrainingShare[]
 
   @@map("users")
 }
@@ -176,4 +177,22 @@ model StrengthSession {
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
   connection WhoopConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
   @@map("strength_sessions")
+}
+
+// Explicitly published, immutable workout snapshots. Account deletion cascades public shares.
+model TrainingShare {
+  id           String    @id @default(uuid())
+  userId       String    @map("user_id")
+  token        String    @unique
+  template     String
+  theme        String
+  title        String
+  snapshot     Json      @map("snapshot_jsonb")
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  expiresAt    DateTime  @map("expires_at") @db.Timestamptz(6)
+  revokedAt    DateTime? @map("revoked_at") @db.Timestamptz(6)
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("training_shares")
 }

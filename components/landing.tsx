@@ -22,12 +22,12 @@ import {
 const content = {
   en: {
     nav: ["Capabilities", "How it works", "Questions"],
-    sign: "Connect account",
+    sign: "Sign in",
     badge: "YOUR BODY. BETTER UNDERSTOOD.",
     title: ["Your recovery.", "A clearer tomorrow."],
     intro:
-      "Turn your WHOOP data into a conversation worth having. Explore your sleep, recovery and training with an AI coach that knows your context.",
-    cta: "Connect your WHOOP",
+      "Your recovery, sleep and training, in one personal dashboard. Keep a workout journal, share it in your own style, and bring the full picture to your AI coach.",
+    cta: "Open your personal dashboard",
     secondary: "Explore the experience",
     note: "Read-only access · Your account, your data",
     sample: "ILLUSTRATIVE PREVIEW · NOT LIVE DATA",
@@ -89,12 +89,12 @@ const content = {
   },
   "zh-CN": {
     nav: ["数据能力", "使用步骤", "常见问题"],
-    sign: "连接账号",
+    sign: "登录",
     badge: "更懂身体，更懂自己",
     title: ["读懂今天的恢复，", "安排更好的明天。"],
     intro:
-      "让 WHOOP 数据成为有价值的对话。结合睡眠、恢复与训练记录，获得真正贴合个人状态的教练建议。",
-    cta: "连接你的 WHOOP",
+      "在个人 dashboard 查看恢复、睡眠与训练。用喜欢的样式分享训练记录，也把完整背景带给你的 AI 教练。",
+    cta: "登录，进入个人工作台",
     secondary: "了解使用体验",
     note: "只读授权 · 你的账号，你的数据",
     sample: "示例预览 · 非实时数据",
@@ -148,12 +148,12 @@ const content = {
   },
   "zh-TW": {
     nav: ["資料能力", "使用步驟", "常見問題"],
-    sign: "連接帳號",
+    sign: "登入",
     badge: "更懂身體，更懂自己",
     title: ["讀懂今天的恢復，", "安排更好的明天。"],
     intro:
-      "讓 WHOOP 資料成為有價值的對話。結合睡眠、恢復與訓練紀錄，獲得貼合個人狀態的教練建議。",
-    cta: "連接你的 WHOOP",
+      "在個人 dashboard 查看恢復、睡眠與訓練。用喜歡的樣式分享訓練紀錄，也把完整背景帶給你的 AI 教練。",
+    cta: "登入，進入個人工作台",
     secondary: "了解使用體驗",
     note: "唯讀授權 · 你的帳號，你的資料",
     sample: "範例預覽 · 非即時資料",
@@ -235,7 +235,7 @@ export default function Landing() {
             <option value="zh-CN">简中</option>
             <option value="zh-TW">繁中</option>
           </select>
-          <Link className="btn small" href="/settings/connections">
+          <Link className="btn small" href="/sign-in">
             {t.sign}
             <ArrowUpRight size={15} />
           </Link>
@@ -255,7 +255,7 @@ export default function Landing() {
             </h1>
             <p>{t.intro}</p>
             <div className="cta-row">
-              <Link className="btn" href="/settings/connections">
+              <Link className="btn" href="/sign-in">
                 {t.cta}
                 <ArrowUpRight size={18} />
               </Link>
@@ -437,7 +437,7 @@ export default function Landing() {
           <span className="kicker">THE NEXT CHAPTER IS YOURS</span>
           <h2>{t.end}</h2>
           <p>{t.enddesc}</p>
-          <Link className="btn" href="/settings/connections">
+          <Link className="btn" href="/sign-in">
             {t.cta}
             <ArrowUpRight size={18} />
           </Link>
