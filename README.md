@@ -14,7 +14,7 @@ Your personal WHOOP dashboard, workout journal and share studio — alongside a 
 
 Sign in to see recovery, sleep and training in one private workspace, inspect Strength Trainer sets, and choose how a workout becomes a shareable page. Whooper also carries forward the original GPT's coaching instructions and all six WHOOP data domains through authenticated, read-only MCP tools. Each person connects their own WHOOP account.
 
-**[Open the public trial](https://whooper.eazylee.si)** · [Download plugin](https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.2.1) · [Plugin source](plugin) · [Privacy](https://whooper.eazylee.si/privacy)
+**[Open the public trial](https://whooper.eazylee.si)** · [Download plugin](https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.3.1) · [Plugin source](plugin) · [Privacy](https://whooper.eazylee.si/privacy)
 
 ## What you can do
 

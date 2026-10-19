@@ -443,7 +443,7 @@ export default function Landing() {
           </Link>
           <a
             className="text-link"
-            href="https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.2.1"
+            href="https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.3.1"
           >
             {t.package}
             <ArrowUpRight size={16} />

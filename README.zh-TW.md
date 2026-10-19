@@ -14,7 +14,7 @@
 
 登入後，在私人工作台查看恢復、睡眠及訓練，展開 Strength Trainer 逐組紀錄，再為一次訓練選擇分享樣式。同時保留原 GPT 的完整教練指令、六類 WHOOP 資料與認證唯讀 MCP 工具。每位使用者連接自己的 WHOOP 帳號。
 
-**[公開試用](https://whooper.eazylee.si)** · [下載外掛安裝包](https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.2.1) · [外掛原始碼](plugin) · [隱私說明](https://whooper.eazylee.si/privacy)
+**[公開試用](https://whooper.eazylee.si)** · [下載外掛安裝包](https://github.com/EazyLee30/whooper-2.0/releases/tag/v0.3.1) · [外掛原始碼](plugin) · [隱私說明](https://whooper.eazylee.si/privacy)
 
 ## 功能
 
