@@ -1933,3 +1933,180 @@
     border: 0;
   }
 }
+
+.dash-image-export {
+  padding: 18px 0;
+  border-top: 1px solid var(--dash-line);
+}
+.dash-export-toolbar {
+  display: flex;
+  align-items: end;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.dash-export-toolbar label {
+  display: grid;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--dash-muted);
+}
+.dash-export-toolbar select {
+  max-width: 100%;
+  padding: 10px;
+  border: 1px solid var(--dash-line);
+  border-radius: 8px;
+  background: var(--dash-bg);
+  color: var(--dash-ink);
+  font: inherit;
+}
+.dash-export-gallery {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 16px 0;
+}
+.dash-export-gallery figure {
+  flex: 0 0 min(280px, 85%);
+  margin: 0;
+  scroll-snap-align: start;
+}
+.dash-export-gallery img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid var(--dash-line);
+  border-radius: 8px;
+}
+.dash-export-gallery figcaption {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--dash-muted);
+}
+
+button.dash-week-day {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 160ms;
+}
+button.dash-week-day:hover {
+  background: var(--dash-line);
+}
+button.dash-week-day:focus-visible {
+  outline: 2px solid var(--dash-accent);
+  outline-offset: 4px;
+}
+button.dash-week-day:disabled {
+  cursor: wait;
+}
+.dash-day-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: #0007;
+  animation: dash-day-fade 160ms ease-out;
+}
+.dash-day-dialog {
+  position: fixed;
+  z-index: 81;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(480px, calc(100vw - 32px));
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+  padding: 32px;
+  border: 1px solid var(--dash-line);
+  border-radius: 18px;
+  color: var(--dash-ink);
+  background: var(--dash-bg);
+  box-shadow: 0 24px 80px #0004;
+  animation: dash-day-fade 180ms ease-out;
+}
+.dash-day-dialog h2 {
+  margin: 14px 0;
+  font-size: 26px;
+}
+.dash-day-dialog > p {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--dash-muted);
+}
+.dash-day-close {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  display: grid;
+  place-items: center;
+  padding: 8px;
+  border: 0;
+  border-radius: 50%;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+.dash-day-close:hover {
+  background: var(--dash-line);
+}
+.dash-day-stats {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin: 24px 0;
+}
+.dash-day-stats strong {
+  font-size: 40px;
+  color: var(--dash-accent);
+}
+.dash-day-stats small,
+.dash-day-stats > span {
+  font-size: 12px;
+  color: var(--dash-muted);
+}
+.dash-day-workouts {
+  padding: 0;
+  list-style: none;
+}
+.dash-day-workouts button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+  color: inherit;
+  background: none;
+  border: 0;
+  border-top: 1px solid var(--dash-line);
+  text-align: left;
+  cursor: pointer;
+}
+.dash-day-workouts button span {
+  display: grid;
+  gap: 7px;
+}
+.dash-day-workouts small {
+  color: var(--dash-muted);
+}
+@keyframes dash-day-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dash-day-overlay,
+  .dash-day-dialog {
+    animation: none;
+  }
+}

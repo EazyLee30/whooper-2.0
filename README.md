@@ -31,7 +31,6 @@ Ask: “Compare my recovery and sleep over the last seven days.” Or: “Given 
 
 ## Dashboard and share studio
 
-
 The home page introduces Whooper to visitors. Signing in opens the private `/dashboard`; the dashboard, workout details and studio require your account. Choose a date, inspect the latest seven days of activity, and select a workout for its recorded sets, reps and loads. Strength Trainer details require the optional connection described below. Empty accounts show clearly labeled template examples; examples cannot be published as your workouts.
 
 The workspace has three destinations: **Overview** shows daily metrics, the seven-day rhythm and the three most recent workout summaries; **Workouts** contains the complete list for the selected period and session details; **Share studio** has **Create page** (`创建页面`) and **Shared** (`已分享`) tabs for composing pages and managing existing links. The theme picker stays in the top bar.
@@ -45,7 +44,7 @@ The theme picker brings over eight palettes from the personal github.io site: **
 | `journal` · Training journal | An editorial workout log inspired by the github.io typography |
 | `pulse` · Performance card | A compact presentation of the session's recorded metrics and exercises |
 
-Use **Save PNG** directly above the single full preview in the studio's **Create page** tab to export the two original presentations (`ledger` and `illustrated`). Longer training sheets are paginated. Artwork credit and license notices are preserved; Workout Guide illustrations use CC BY-SA 4.0.
+In the studio’s **Create page** tab, choose **IG Post 4:5 (1080 × 1350)**, **square (1080 × 1080)**, **IG Story 9:16 (1080 × 1920)** or the original image size, then generate and preview PNGs for the two original presentations (`ledger`, `illustrated`). Download each image for an Instagram post, carousel or Story; supported devices also offer a system file-sharing menu. Available target apps depend on the device. Story exports reserve top and bottom space, movement cards paginate by complete set rows, and artwork credits stay on the images. Workout Guide illustrations use CC BY-SA 4.0.
 
 The studio stays private until you select **Create share page**. Each new link stores an independent snapshot with your title, template and theme, workout timing, activity, duration, strain and calories, plus available completed strength exercises, sets, reps, loads, units and total volume. It excludes recovery, sleep, heart-rate measurements, profile/member identity and credentials. A snapshot does not update with later WHOOP changes. Anyone holding its link can view it without signing in until it expires after 30 days or you revoke it from **Share studio → Shared**. Deleting your Whooper account data also deletes its shares.
 

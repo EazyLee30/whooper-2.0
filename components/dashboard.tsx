@@ -11,7 +11,6 @@ import {
   Check,
   Clock3,
   Copy,
-  Download,
   Dumbbell,
   ExternalLink,
   Heart,
@@ -36,6 +35,8 @@ import type { PublicStrength } from "@/lib/public-workout/strength-data";
 import { DEMO_DASHBOARD, DEMO_STRENGTH } from "@/lib/dashboard/demo";
 import { WorkoutPresentation } from "./workout-presentation";
 import { ThemePicker, useTheme } from "./theme-picker";
+import { TrainingWeek } from "./training-week";
+import { ImageExport } from "./image-export";
 import "./dashboard.css";
 
 const views = [
@@ -105,7 +106,6 @@ export default function Dashboard({ initialView }: { initialView?: string }) {
   const [revoking, setRevoking] = useState<string | null>(null);
   const [copied, setCopied] = useState("");
   const [evaluatedAt, setEvaluatedAt] = useState(0);
-  const [exporting, setExporting] = useState(false);
   const exportContent = useRef<HTMLDivElement>(null);
   const configRevision = useRef(0);
   const selected =
@@ -274,22 +274,6 @@ export default function Dashboard({ initialView }: { initialView?: string }) {
       );
     } finally {
       setRevoking(null);
-    }
-  }
-  async function saveImage() {
-    if (!selected || loading || !exportContent.current || exporting) return;
-    setExporting(true);
-    setMessage("");
-    try {
-      const { exportWorkoutImage } = await import("@/lib/export-workout");
-      const element = exportContent.current.querySelector<HTMLElement>(".wp");
-      if (!element) return;
-      await exportWorkoutImage(element, template, selected.date);
-      setMessage("训练图片已导出。");
-    } catch {
-      setMessage("图片导出失败，请重试。");
-    } finally {
-      setExporting(false);
     }
   }
   function invalidateShare() {
@@ -524,49 +508,14 @@ export default function Dashboard({ initialView }: { initialView?: string }) {
                         </strong>
                         <span>有训练记录</span>
                       </div>
-                      <div
-                        className="dash-week-chart"
-                        aria-label="最近七天训练与负荷"
-                      >
-                        {(
-                          data?.week ??
-                          Array.from({ length: 7 }, (_, i) => ({
-                            date: `0000-00-0${i + 1}`,
-                            trained: null,
-                            strain: null,
-                          }))
-                        ).map((day, index) => (
-                          <div
-                            key={day.date}
-                            className={`dash-week-day ${day.trained ? "is-trained" : ""} ${index === 6 ? "is-today" : ""}`}
-                          >
-                            <span>
-                              {day.strain == null ? "—" : number(day.strain, 1)}
-                            </span>
-                            <div className="dash-bar-track">
-                              <i
-                                style={{
-                                  height:
-                                    day.strain == null
-                                      ? "3px"
-                                      : `${Math.max(4, Math.min(100, (day.strain / 21) * 100))}%`,
-                                }}
-                              />
-                            </div>
-                            <small>{loading ? "·" : shortDate(day.date)}</small>
-                            <i
-                              className="dash-day-dot"
-                              title={
-                                day.trained === null
-                                  ? "暂无数据"
-                                  : day.trained
-                                    ? "已训练"
-                                    : "无训练记录"
-                              }
-                            />
-                          </div>
-                        ))}
-                      </div>
+                      <TrainingWeek
+                        data={data}
+                        loading={loading}
+                        onWorkout={(id) => {
+                          pickWorkout(id);
+                          navigate("workouts");
+                        }}
+                      />
                       <div className="dash-chart-legend">
                         <span>
                           <i />
@@ -901,27 +850,17 @@ export default function Dashboard({ initialView }: { initialView?: string }) {
                         ? "页面预览"
                         : "示例数据 · 连接 WHOOP 后可分享自己的训练"}
                   </span>
-                  {selected &&
-                  (template === "ledger" || template === "illustrated") ? (
-                    <button
-                      className="dash-text-button"
-                      onClick={saveImage}
-                      disabled={
-                        exporting ||
-                        loading ||
-                        strengthLoading ||
-                        !!strengthError
-                      }
-                    >
-                      {exporting ? (
-                        <LoaderCircle size={14} className="dash-spin" />
-                      ) : (
-                        <Download size={14} />
-                      )}
-                      {exporting ? "导出中…" : "保存 PNG"}
-                    </button>
-                  ) : null}
                 </div>
+                {selected &&
+                (template === "ledger" || template === "illustrated") ? (
+                  <ImageExport
+                    key={`${selected.id}-${template}-${theme}-${title}-${strength?.fetched_at ?? "none"}-${data?.updatedAt}`}
+                    root={exportContent}
+                    template={template}
+                    date={selected.date}
+                    disabled={loading || strengthLoading || !!strengthError}
+                  />
+                ) : null}
                 <div ref={exportContent}>
                   <WorkoutPresentation
                     snapshot={snapshot}

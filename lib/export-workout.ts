@@ -1,4 +1,10 @@
 import type { TemplateId } from "@/lib/presentation";
+import {
+  imagePlacement,
+  imageBodyHeight,
+  type ImageFormat,
+} from "./image-formats";
+type ImageSink = (canvas: HTMLCanvasElement, filename: string) => Promise<void>;
 
 type Ink = {
   background: string;
@@ -22,11 +28,9 @@ type MovementCard = {
 };
 
 const WIDTH = 1080;
-const MAX_HEIGHT = 16000;
 const HEADER = 270;
 const FOOTER = 180;
 const CARD_GAP = 24;
-const BODY_HEIGHT = MAX_HEIGHT - HEADER - FOOTER;
 const cleanText = (element: Element | null) =>
   element?.textContent?.replace(/\s+/g, " ").trim() ?? "";
 
@@ -147,25 +151,18 @@ async function localSvg(
   );
 }
 
-async function download(canvas: HTMLCanvasElement, filename: string) {
+async function imageFile(
+  canvas: HTMLCanvasElement,
+  filename: string,
+): Promise<File> {
   const blob = await new Promise<Blob>((resolve, reject) =>
     canvas.toBlob(
       (value) =>
-        value
-          ? resolve(value)
-          : reject(new Error("图片导出失败，请尝试打印。")),
+        value ? resolve(value) : reject(new Error("图片导出失败，请重试。")),
       "image/png",
     ),
   );
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  window.setTimeout(() => URL.revokeObjectURL(url), 30000);
-  canvas.width = canvas.height = 0;
+  return new File([blob], filename, { type: "image/png" });
 }
 
 function drawSheetText(
@@ -210,7 +207,11 @@ function drawSheetText(
   if ("letterSpacing" in context) context.letterSpacing = "0px";
 }
 
-async function exportLedger(root: HTMLElement, date: string) {
+async function exportLedger(
+  root: HTMLElement,
+  date: string,
+  output: ImageSink,
+) {
   await document.fonts.load("400 38px WPTrainingHand");
   await document.fonts.ready;
   const sheets = Array.from(
@@ -255,7 +256,7 @@ async function exportLedger(root: HTMLElement, date: string) {
     captions.forEach((line, lineIndex) =>
       text(context, line, 32, footerTop + lineIndex * 19, 13, "#74624c"),
     );
-    await download(
+    await output(
       canvas,
       `whooper-workout-${date}-ledger${sheets.length > 1 ? `-${index + 1}` : ""}.png`,
     );
@@ -297,6 +298,7 @@ async function movementCards(
   root: HTMLElement,
   context: CanvasRenderingContext2D,
   ink: Ink,
+  bodyHeight: number,
 ): Promise<MovementCard[]> {
   const result: MovementCard[] = [];
   for (const card of root.querySelectorAll<HTMLElement>(".wp-original-card")) {
@@ -339,7 +341,7 @@ async function movementCards(
     do {
       const continuedTitle = offset > 0 ? [...title, "(continued)"] : title;
       const contentTop = 24 + continuedTitle.length * 36 + 22;
-      const rowBudget = BODY_HEIGHT - contentTop - 52;
+      const rowBudget = bodyHeight - contentTop - 52;
       if (rowBudget < 180)
         throw new Error("动作名称过长，无法生成图片；请使用打印保存完整记录。");
       const chunk: SetRow[] = [];
@@ -365,7 +367,12 @@ async function movementCards(
   return result;
 }
 
-async function exportIllustrated(root: HTMLElement, date: string) {
+async function exportIllustrated(
+  root: HTMLElement,
+  date: string,
+  output: ImageSink,
+  format: ImageFormat,
+) {
   await Promise.all([
     document.fonts.load("400 28px WPJetBrains"),
     document.fonts.load("400 28px WPGeist"),
@@ -373,14 +380,15 @@ async function exportIllustrated(root: HTMLElement, date: string) {
   await document.fonts.ready;
   const ink = colors(root);
   const measurement = makeCanvas(WIDTH, 1);
-  const cards = await movementCards(root, measurement.context, ink);
+  const bodyHeight = imageBodyHeight(format, HEADER, FOOTER);
+  const cards = await movementCards(root, measurement.context, ink, bodyHeight);
   measurement.canvas.width = measurement.canvas.height = 0;
   const pages: MovementCard[][] = [[]];
   let pageHeight = 0;
   for (const card of cards) {
     if (
       pages.at(-1)!.length &&
-      pageHeight + card.height + CARD_GAP > BODY_HEIGHT
+      pageHeight + card.height + CARD_GAP > bodyHeight
     ) {
       pages.push([]);
       pageHeight = 0;
@@ -503,7 +511,7 @@ async function exportIllustrated(root: HTMLElement, date: string) {
       12,
       ink.muted,
     );
-    await download(
+    await output(
       canvas,
       `whooper-workout-${date}-movement${pages.length > 1 ? `-${pageIndex + 1}` : ""}.png`,
     );
@@ -511,11 +519,12 @@ async function exportIllustrated(root: HTMLElement, date: string) {
 }
 
 /** Save a full private preview locally. No workout data is sent to a service. */
-export async function exportWorkoutImage(
+export async function prepareWorkoutImages(
   element: HTMLElement,
   template: TemplateId,
   date: string,
-): Promise<void> {
+  format: ImageFormat = "original",
+): Promise<File[]> {
   if (template !== "ledger" && template !== "illustrated")
     throw new Error("这个模板暂不支持 PNG 导出，请使用打印。");
   const root = element.matches(".wp")
@@ -524,6 +533,26 @@ export async function exportWorkoutImage(
   if (!root || root.classList.contains("wp-compact"))
     throw new Error("请打开完整预览后再保存图片。");
   const safeDate = /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : "session";
-  if (template === "ledger") await exportLedger(root, safeDate);
-  else await exportIllustrated(root, safeDate);
+  const files: File[] = [];
+  const output: ImageSink = async (source, filename) => {
+    const placement = imagePlacement(source.width, source.height, format);
+    const { canvas, context } = makeCanvas(placement.width, placement.height);
+    context.fillStyle =
+      template === "ledger" ? "#f3ecd9" : colors(root).background;
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(
+      source,
+      placement.x,
+      placement.y,
+      placement.drawWidth,
+      placement.drawHeight,
+    );
+    files.push(
+      await imageFile(canvas, filename.replace(".png", `-${format}.png`)),
+    );
+    source.width = source.height = canvas.width = canvas.height = 0;
+  };
+  if (template === "ledger") await exportLedger(root, safeDate, output);
+  else await exportIllustrated(root, safeDate, output, format);
+  return files;
 }
