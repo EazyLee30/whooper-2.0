@@ -225,51 +225,8 @@
   border-radius: 50%;
   margin-left: auto;
 }
-.dash-sidebar-note {
-  margin: 52px 4px 25px;
-  padding: 20px 13px 18px;
-  border-top: 1px solid var(--dash-line);
-  border-bottom: 1px solid var(--dash-line);
-}
-.dash-sidebar-note-symbol {
-  display: block;
-  font:
-    30px Georgia,
-    serif;
-  margin-bottom: 14px;
-  color: var(--dash-accent);
-}
-.dash-sidebar-note strong {
-  font-size: 12px;
-  font-weight: 500;
-}
-.dashboard .dash-sidebar-note p {
-  font-size: 10px;
-  color: var(--dash-muted);
-  line-height: 1.9;
-  margin-top: 10px;
-}
-.dashboard .dash-sidebar-note button {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 10px;
-  color: var(--dash-accent);
-  margin-top: 19px;
-}
 .dash-sidebar-bottom {
   margin-top: auto;
-}
-.dash-sidebar-bottom > a {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 10px;
-  color: var(--dash-muted);
-  font-size: 11px;
-}
-.dash-sidebar-bottom > a svg:last-child {
-  margin-left: auto;
 }
 .dash-account {
   display: flex;
@@ -375,32 +332,16 @@
   color: var(--dash-muted);
 }
 .dashboard .dash-page-heading h1 {
-  font-size: clamp(25px, 2.8vw, 38px);
+  font-size: clamp(25px, 2.5vw, 32px);
   font-weight: 500;
   line-height: 1.4;
-  letter-spacing: -1.5px;
-  margin: 15px 0 10px;
+  letter-spacing: -0.9px;
+  margin: 11px 0 9px;
 }
 .dashboard .dash-page-heading p {
   font-size: 11px;
   color: var(--dash-muted);
   line-height: 1.8;
-}
-.dash-page-index {
-  font:
-    42px Georgia,
-    serif;
-  color: var(--dash-line);
-  letter-spacing: -2px;
-  white-space: nowrap;
-}
-.dash-page-index small {
-  font:
-    9px DashMono,
-    monospace;
-  letter-spacing: 0;
-  margin-left: 7px;
-  color: var(--dash-muted);
 }
 .dash-date-row {
   display: flex;
@@ -522,11 +463,6 @@
 .dash-metric-blue > div svg,
 .dash-metric-blue .dash-metric-caption i {
   color: #5a89a5;
-}
-.dash-overview-grid {
-  display: grid;
-  grid-template-columns: 1.3fr 1fr;
-  gap: 24px;
 }
 .dash-panel {
   border: 1px solid var(--dash-line);
@@ -659,75 +595,6 @@
   height: 4px;
   border-radius: 50%;
   background: var(--dash-accent);
-}
-.dash-feature-template {
-  position: relative;
-  padding: 25px 24px 20px;
-  background: var(--dash-surface);
-  display: flex;
-  flex-direction: column;
-}
-.dash-feature-template > .dash-panel-heading {
-  position: relative;
-  z-index: 1;
-}
-.dash-mini-sheet {
-  margin: 22px auto -10px;
-  background: #eee5d2;
-  color: #2f3029;
-  transform: rotate(-7deg);
-  width: 230px;
-  padding: 22px 18px 12px;
-  box-shadow: 0 6px 20px #0001;
-  border: 1px solid #c5bda4;
-  font-family: Georgia, serif;
-}
-.dash-mini-sheet > span {
-  font:
-    5px DashMono,
-    monospace;
-  letter-spacing: 1.2px;
-}
-.dash-mini-sheet > strong {
-  display: block;
-  font-size: 26px;
-  font-weight: 400;
-  margin: 7px 0 14px;
-}
-.dash-mini-sheet > div {
-  display: grid;
-  grid-template-columns: 2.4fr 1fr 1fr;
-  border-bottom: 1px solid #9f9b8b;
-  padding: 7px 0;
-  font-size: 6px;
-}
-.dash-mini-sheet > div i {
-  font: 10px cursive;
-}
-.dash-mini-sheet > small {
-  font:
-    4px DashMono,
-    monospace;
-  letter-spacing: 1px;
-  display: block;
-  text-align: right;
-  margin-top: 15px;
-}
-.dash-feature-copy {
-  position: relative;
-  margin-top: auto;
-  padding: 22px 0 0;
-  background: linear-gradient(transparent, var(--dash-surface) 30%);
-}
-.dashboard .dash-feature-copy h2 {
-  font-size: 20px;
-  font-weight: 500;
-  letter-spacing: -0.7px;
-}
-.dashboard .dash-feature-copy p {
-  font-size: 10px;
-  color: var(--dash-muted);
-  margin: 7px 0 13px;
 }
 .dashboard .dash-text-button {
   display: inline-flex;
@@ -977,170 +844,6 @@
   margin: 0 10px;
   color: var(--dash-accent);
 }
-.dash-library-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 0 24px;
-  border-top: 1px solid var(--dash-line);
-  font-size: 10px;
-  color: var(--dash-muted);
-  gap: 16px;
-}
-.dash-count {
-  font:
-    17px DashMono,
-    monospace;
-  color: var(--dash-ink);
-  margin-right: 8px;
-}
-.dash-library-divider {
-  margin: 0 13px;
-  color: var(--dash-line);
-}
-.dash-template-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 17px;
-  align-items: stretch;
-}
-.dashboard .dash-template-card {
-  min-width: 0;
-  text-align: left;
-  border: 1px solid var(--dash-line);
-  border-radius: 6px;
-  overflow: hidden;
-  transition:
-    transform 0.2s,
-    border-color 0.2s;
-}
-.dash-template-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--dash-accent);
-}
-.dash-template-card.is-selected {
-  border-color: var(--dash-accent);
-  box-shadow: 0 0 0 1px var(--dash-accent);
-}
-.dash-template-thumbnail {
-  position: relative;
-  height: 213px;
-  overflow: hidden;
-  background: var(--dash-surface);
-  padding: 23px 15px 0;
-  pointer-events: none;
-}
-.dash-template-thumbnail > article,
-.dash-template-thumbnail > .workout-presentation {
-  width: 320px !important;
-  min-width: 320px;
-  transform: scale(0.58);
-  transform-origin: top left;
-  pointer-events: none;
-}
-.dash-template-number {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font:
-    7px DashMono,
-    monospace;
-  background: var(--dash-bg);
-  border: 1px solid var(--dash-line);
-  color: var(--dash-muted);
-  padding: 3px 5px;
-  border-radius: 2px;
-}
-.dash-template-card-copy {
-  padding: 17px 15px 20px;
-}
-.dash-template-category {
-  font-size: 8px;
-  color: var(--dash-muted);
-}
-.dashboard .dash-template-card-copy h2 {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 15px;
-  font-weight: 500;
-  letter-spacing: -0.5px;
-  margin: 7px 0 9px;
-  gap: 7px;
-}
-.dash-template-card-copy h2 svg {
-  color: var(--dash-muted);
-}
-.is-selected .dash-template-card-copy h2 svg {
-  color: var(--dash-accent);
-}
-.dashboard .dash-template-card-copy p {
-  font-size: 9px;
-  line-height: 1.9;
-  color: var(--dash-muted);
-}
-.dash-studio {
-  margin-top: 35px;
-  padding-top: 35px;
-  border-top: 1px solid var(--dash-line);
-  display: grid;
-  grid-template-columns: 300px minmax(0, 1fr);
-  gap: 34px;
-}
-.dashboard .dash-studio-settings h2 {
-  font-size: 24px;
-  font-weight: 500;
-  letter-spacing: -1px;
-  margin: 12px 0 10px;
-}
-.dashboard .dash-studio-settings > p {
-  font-size: 10px;
-  line-height: 1.9;
-  color: var(--dash-muted);
-  margin-bottom: 22px;
-}
-.dash-studio-settings > label {
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
-  font-size: 10px;
-  margin-top: 20px;
-}
-.dash-studio-settings input,
-.dash-studio-settings select {
-  padding: 12px 11px;
-  min-width: 0;
-  width: 100%;
-  border: 1px solid var(--dash-line);
-  border-radius: 4px;
-  background: var(--dash-bg);
-  color: var(--dash-ink);
-  font-size: 11px;
-}
-.dash-share-summary {
-  display: grid;
-  gap: 14px;
-  border-top: 1px solid var(--dash-line);
-  border-bottom: 1px solid var(--dash-line);
-  padding: 17px 0;
-  margin-top: 23px;
-  font-size: 10px;
-}
-.dash-share-summary > span {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 15px;
-  color: var(--dash-muted);
-}
-.dash-share-summary strong {
-  font-size: 10px;
-  font-weight: 500;
-  color: var(--dash-ink);
-}
-.dash-share-summary .dash-theme-trigger {
-  color: var(--dash-ink);
-}
 .dash-share-privacy {
   display: flex;
   align-items: flex-start;
@@ -1161,18 +864,6 @@
 .dash-create-button svg:last-child {
   margin-left: auto;
 }
-.dashboard .dash-studio-settings .dash-action-message {
-  font-size: 10px;
-  color: var(--dash-accent);
-  margin: 10px 0 0;
-  min-height: 18px;
-}
-.dashboard .dash-studio-settings .dash-preview-note {
-  font-size: 9px;
-  color: var(--dash-muted);
-  margin: 12px 0 0;
-  line-height: 1.8;
-}
 .dash-created-link {
   margin-top: 10px;
   padding: 12px;
@@ -1191,53 +882,6 @@
 }
 .dash-created-link .dash-text-button {
   font-size: 9px;
-}
-.dash-studio-preview {
-  min-width: 0;
-  padding: 18px;
-  background: var(--dash-surface);
-  border: 1px solid var(--dash-line);
-  border-radius: 6px;
-}
-.dash-preview-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  font:
-    8px DashMono,
-    monospace;
-  color: var(--dash-muted);
-  margin-bottom: 17px;
-}
-.dash-preview-heading .dash-text-button {
-  font-size: 9px;
-}
-.dash-studio-preview > .workout-presentation {
-  box-shadow: 0 7px 22px #0001;
-}
-.dash-full-preview {
-  position: fixed;
-  max-width: 880px;
-  width: calc(100% - 32px);
-  max-height: 92dvh;
-  padding: 24px;
-  background: var(--dash-bg);
-  color: var(--dash-ink);
-  border: 1px solid var(--dash-line);
-  border-radius: 8px;
-  margin: auto;
-}
-.dash-full-preview::backdrop {
-  background: #0009;
-  backdrop-filter: blur(5px);
-}
-.dash-full-preview-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-  font-size: 11px;
 }
 .dash-empty-shares {
   padding: 80px 24px;
@@ -1546,15 +1190,218 @@
   font-size: 12px;
   margin-bottom: 25px;
 }
-@media (min-width: 1500px) {
-  .dash-template-thumbnail > article,
-  .dash-template-thumbnail > .workout-presentation {
-    transform: scale(0.69);
-  }
-  .dash-template-thumbnail {
-    height: 245px;
-  }
+
+/* A single destination for composing and managing workout pages. */
+.dash-studio-tabs {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  border-bottom: 1px solid var(--dash-line);
+  margin: 0 0 28px;
 }
+.dashboard .dash-studio-tabs > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 2px 13px;
+  margin-bottom: -1px;
+  border-bottom: 2px solid transparent;
+  font-size: 12px;
+  color: var(--dash-muted);
+}
+.dashboard .dash-studio-tabs > button[aria-current="page"] {
+  border-bottom-color: var(--dash-ink);
+  color: var(--dash-ink);
+  font-weight: 500;
+}
+.dashboard .dash-studio-tabs > button:hover {
+  color: var(--dash-ink);
+}
+.dash-studio {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
+}
+.dash-studio-settings {
+  position: sticky;
+  top: 24px;
+  min-width: 0;
+}
+.dash-studio-settings > label {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  font-size: 11px;
+  margin-top: 22px;
+}
+.dash-studio-settings > label:first-child {
+  margin-top: 0;
+}
+.dash-studio-settings input,
+.dash-studio-settings select {
+  padding: 12px 11px;
+  min-width: 0;
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--dash-line);
+  border-radius: 4px;
+  background: var(--dash-bg);
+  color: var(--dash-ink);
+  font-size: 11px;
+}
+.dash-template-options {
+  padding: 0;
+  margin: 26px 0 0;
+  border: 0;
+  min-width: 0;
+}
+.dash-template-options > legend {
+  padding: 0;
+  margin-bottom: 11px;
+  font-size: 11px;
+}
+.dashboard .dash-template-option {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) 16px;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  min-height: 64px;
+  padding: 13px 12px;
+  border: 1px solid transparent;
+  border-bottom-color: var(--dash-line);
+  border-radius: 3px;
+  text-align: left;
+}
+.dashboard .dash-template-option:hover {
+  background: var(--dash-surface);
+}
+.dashboard .dash-template-option.is-selected {
+  background: var(--dash-surface);
+  border-color: var(--dash-line);
+}
+.dash-template-option-number {
+  font:
+    9px DashMono,
+    monospace;
+  color: var(--dash-muted);
+}
+.dash-template-option strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.dash-template-option small {
+  display: block;
+  font-size: 9px;
+  line-height: 1.5;
+  color: var(--dash-muted);
+  margin-top: 3px;
+}
+.dash-template-option > svg {
+  color: var(--dash-accent);
+}
+.dashboard .dash-template-description {
+  margin-top: 13px;
+  color: var(--dash-muted);
+  font-size: 10px;
+  line-height: 1.8;
+}
+.dashboard .dash-studio-settings .dash-action-message {
+  font-size: 10px;
+  line-height: 1.8;
+  color: var(--dash-accent);
+  margin: 12px 0 0;
+  overflow-wrap: anywhere;
+}
+.dashboard .dash-studio-settings .dash-action-message:empty {
+  display: none;
+}
+.dashboard .dash-studio-settings .dash-preview-note {
+  font-size: 9px;
+  color: var(--dash-muted);
+  margin: 12px 0 0;
+  line-height: 1.8;
+}
+.dash-studio-preview {
+  min-width: 0;
+  padding: 20px;
+  background: var(--dash-bg);
+  border: 1px solid var(--dash-line);
+  border-radius: 6px;
+}
+.dash-studio-preview > div:last-child {
+  width: 100%;
+  max-width: 760px;
+  margin-inline: auto;
+}
+.dash-preview-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 18px;
+  min-height: 30px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--dash-line);
+  margin-bottom: 20px;
+  color: var(--dash-muted);
+  font-size: 10px;
+  line-height: 1.7;
+}
+.dash-preview-heading > span {
+  flex: 1;
+  min-width: 150px;
+}
+.dash-preview-heading .dash-text-button {
+  font-size: 10px;
+  min-height: 32px;
+  white-space: nowrap;
+}
+.dash-preview-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+/* Overview keeps the week in one panel and points to the full training list. */
+.dash-overview-grid {
+  display: block;
+}
+.dash-workout-list.is-compact .dash-workout-row {
+  gap: 16px;
+  padding: 16px 10px;
+}
+.dash-workout-list.is-compact .dash-workout-icon {
+  width: 34px;
+  height: 36px;
+  background: transparent;
+  border-color: transparent;
+}
+.dash-workout-list.is-compact .dash-workout-name strong {
+  font-size: 12px;
+}
+.dash-workout-list.is-compact .dash-workout-stat {
+  width: 88px;
+  gap: 5px;
+}
+.dash-workout-list.is-compact .dash-workout-stat strong {
+  font-size: 13px;
+}
+.dash-workout-list.is-compact .dash-workout-arrow {
+  width: 28px;
+  height: 28px;
+  border-color: transparent;
+}
+.dash-session-section > .wp {
+  max-width: 760px;
+  margin-inline: auto;
+}
+
 @media (max-width: 1200px) {
   .dash-sidebar {
     width: 200px;
@@ -1569,25 +1416,6 @@
   .dash-content {
     padding: 35px 28px 0;
   }
-  .dash-template-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
-  }
-  .dash-template-thumbnail {
-    height: 245px;
-    padding: 25px 25px 0;
-    display: flex;
-    justify-content: center;
-  }
-  .dash-template-thumbnail > article,
-  .dash-template-thumbnail > .workout-presentation {
-    transform: scale(0.73);
-    transform-origin: top center;
-  }
-  .dash-studio {
-    grid-template-columns: 260px minmax(0, 1fr);
-    gap: 25px;
-  }
   .dash-metric {
     padding: 20px 16px;
   }
@@ -1596,9 +1424,6 @@
   }
   .dash-week-panel {
     padding-inline: 22px;
-  }
-  .dash-overview-grid {
-    gap: 20px;
   }
 }
 @media (max-width: 900px) {
@@ -1617,9 +1442,7 @@
   }
   .dash-beta,
   .dash-sidebar-label,
-  .dash-sidebar-note,
   .dash-nav-item > span,
-  .dash-sidebar-bottom > a,
   .dash-account > span {
     display: none;
   }
@@ -1642,37 +1465,11 @@
   .dash-main {
     margin-left: 74px;
   }
-  .dash-overview-grid {
-    grid-template-columns: 1.2fr 1fr;
-  }
   .dash-topbar {
     min-height: 74px;
   }
   .dash-topbar-actions {
     gap: 15px;
-  }
-  .dash-studio {
-    grid-template-columns: 1fr;
-  }
-  .dash-studio-settings {
-    max-width: 100%;
-  }
-  .dash-studio-settings > label {
-    max-width: 100%;
-  }
-  .dash-share-summary {
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-  }
-  .dash-studio-preview {
-    max-width: 100%;
-  }
-  .dash-feature-template {
-    padding: 22px 20px;
-  }
-  .dash-mini-sheet {
-    width: 195px;
-    padding-inline: 14px;
   }
   .dashboard .dash-panel-heading h2 {
     font-size: 17px;
@@ -1778,14 +1575,6 @@
     max-width: 290px;
     line-height: 1.45;
   }
-  .dash-page-index {
-    font-size: 29px;
-    align-self: flex-start;
-    margin-top: 27px;
-  }
-  .dash-page-index small {
-    display: none;
-  }
   .dash-page-heading {
     margin-bottom: 27px;
   }
@@ -1813,34 +1602,12 @@
   .dash-metric-caption {
     font-size: 6px;
   }
-  .dash-overview-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
   .dash-week-panel {
     padding: 23px 23px 18px;
   }
   .dash-week-chart {
     gap: 15px;
     margin-top: 15px;
-  }
-  .dash-feature-template {
-    min-height: 310px;
-  }
-  .dash-mini-sheet {
-    position: absolute;
-    right: -8px;
-    top: 60px;
-    transform: rotate(-13deg);
-    width: 225px;
-  }
-  .dash-feature-copy {
-    padding-top: 155px;
-    z-index: 1;
-    background: linear-gradient(transparent, var(--dash-surface) 75%);
-  }
-  .dashboard .dash-feature-copy h2 {
-    font-size: 21px;
   }
   .dash-date-row {
     font-size: 8px;
@@ -1925,57 +1692,6 @@
   .dash-footer i {
     margin: 0 5px;
   }
-  .dash-library-toolbar {
-    align-items: flex-start;
-    padding-bottom: 20px;
-  }
-  .dash-library-toolbar > .dash-chip {
-    display: none;
-  }
-  .dash-template-grid {
-    gap: 12px;
-  }
-  .dash-template-thumbnail {
-    height: 175px;
-    padding: 16px 7px 0;
-  }
-  .dash-template-thumbnail > article,
-  .dash-template-thumbnail > .workout-presentation {
-    transform: scale(0.46);
-  }
-  .dash-template-card-copy {
-    padding: 13px 12px 15px;
-  }
-  .dashboard .dash-template-card-copy h2 {
-    font-size: 14px;
-  }
-  .dash-template-card-copy h2 svg {
-    width: 14px;
-    height: 14px;
-  }
-  .dashboard .dash-template-card-copy p {
-    font-size: 8px;
-  }
-  .dash-template-category {
-    font-size: 7px;
-  }
-  .dash-studio {
-    padding-top: 27px;
-    margin-top: 27px;
-    gap: 25px;
-  }
-  .dash-studio-preview {
-    padding: 13px;
-  }
-  .dash-preview-heading {
-    font-size: 7px;
-  }
-  .dash-preview-heading .dash-text-button {
-    font-size: 8px;
-  }
-  .dash-share-summary {
-    grid-template-columns: 1fr;
-  }
   .dash-shares-list .dash-share-row {
     gap: 13px;
     flex-wrap: wrap;
@@ -2037,11 +1753,6 @@
   }
   .dash-theme-trigger kbd {
     display: none;
-  }
-  .dash-full-preview {
-    padding: 16px;
-    width: calc(100% - 16px);
-    max-height: 95dvh;
   }
   .share-page {
     padding-inline: 15px;
@@ -2115,22 +1826,110 @@
   .dash-session-section > .dash-section-heading {
     display: none;
   }
-  .dash-full-preview {
-    max-height: none;
-    overflow: visible;
-  }
 }
-
 .dashboard .dash-theme-dialog {
   overflow-y: auto;
 }
-.dash-preview-actions {
-  display: flex;
-  align-items: center;
-  gap: 18px;
+
+@media (max-width: 1100px) and (min-width: 851px) {
+  .dash-studio {
+    grid-template-columns: 250px minmax(0, 1fr);
+    gap: 24px;
+  }
+  .dash-studio-preview {
+    padding: 16px;
+  }
 }
-.dash-full-preview > .dash-action-message {
-  font-size: 10px;
-  color: var(--dash-muted);
-  margin: 0 0 14px;
+@media (max-width: 850px) {
+  .dash-studio {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+  .dash-studio-settings {
+    position: static;
+  }
+  .dash-studio-settings > label {
+    max-width: 100%;
+  }
+  .dash-template-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 10px;
+  }
+  .dash-template-options > legend {
+    float: left;
+    width: 100%;
+    grid-column: 1 / -1;
+    margin-bottom: 5px;
+  }
+  .dash-template-description {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 650px) {
+  .dash-studio-tabs {
+    gap: 26px;
+    margin-bottom: 24px;
+  }
+  .dashboard .dash-studio-tabs > button {
+    font-size: 11px;
+    min-height: 44px;
+  }
+  .dash-studio {
+    gap: 25px;
+  }
+  .dash-studio-preview {
+    padding: 13px;
+  }
+  .dash-preview-heading {
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    gap: 8px 14px;
+    font-size: 9px;
+  }
+  .dash-preview-heading > span {
+    min-width: 130px;
+  }
+  .dash-preview-heading .dash-text-button {
+    font-size: 9px;
+  }
+  .dashboard .dash-template-option {
+    gap: 8px;
+    padding: 12px 9px;
+    grid-template-columns: 17px minmax(0, 1fr) 14px;
+  }
+  .dash-template-option strong {
+    font-size: 11px;
+  }
+  .dash-template-option small {
+    font-size: 8px;
+  }
+  .dash-workout-list.is-compact .dash-workout-row {
+    gap: 9px !important;
+    padding: 15px 0 !important;
+  }
+  .dash-workout-list.is-compact .dash-workout-stat {
+    width: 55px;
+  }
+  .dash-workout-list.is-compact .dash-workout-stat strong {
+    font-size: 12px;
+  }
+  .dash-workout-list.is-compact .dash-workout-arrow {
+    display: grid;
+    width: 18px;
+  }
+}
+@media print {
+  .dash-studio-settings,
+  .dash-studio-tabs,
+  .dash-preview-heading {
+    display: none !important;
+  }
+  .dash-studio {
+    display: block;
+  }
+  .dash-studio-preview {
+    padding: 0;
+    border: 0;
+  }
 }

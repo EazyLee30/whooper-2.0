@@ -9,7 +9,6 @@ import {
   ArrowRight,
   ArrowUpRight,
   Check,
-  ChevronRight,
   Clock3,
   Copy,
   Download,
@@ -26,7 +25,6 @@ import {
   ShieldCheck,
   Sparkles,
   Trash2,
-  X,
 } from "lucide-react";
 import { TEMPLATES, type TemplateId } from "@/lib/presentation";
 import type {
@@ -45,15 +43,14 @@ const views = [
   { id: "workouts", label: "训练记录", english: "Workouts", icon: Dumbbell },
   {
     id: "library",
-    label: "分享页面库",
+    label: "分享工作室",
     english: "Share studio",
     icon: Sparkles,
   },
-  { id: "shares", label: "我的分享", english: "My links", icon: Link2 },
 ] as const;
-type View = (typeof views)[number]["id"];
+type View = (typeof views)[number]["id"] | "shares";
 const isView = (value: unknown): value is View =>
-  views.some((view) => view.id === value);
+  value === "shares" || views.some((view) => view.id === value);
 const number = (value: number | null | undefined, digits = 0) =>
   value == null
     ? "—"
@@ -103,13 +100,12 @@ export default function Dashboard({ initialView }: { initialView?: string }) {
   const [message, setMessage] = useState("");
   const [createdUrl, setCreatedUrl] = useState("");
   const [shares, setShares] = useState<ShareRecord[]>([]);
-  const [sharesLoading, setSharesLoading] = useState(false);
+  const [sharesLoading, setSharesLoading] = useState(initialView === "shares");
   const [sharesError, setSharesError] = useState("");
   const [revoking, setRevoking] = useState<string | null>(null);
   const [copied, setCopied] = useState("");
   const [evaluatedAt, setEvaluatedAt] = useState(0);
   const [exporting, setExporting] = useState(false);
-  const preview = useRef<HTMLDialogElement>(null);
   const exportContent = useRef<HTMLDivElement>(null);
   const configRevision = useRef(0);
   const selected =
@@ -131,10 +127,12 @@ export default function Dashboard({ initialView }: { initialView?: string }) {
   const snapshot: ShareSnapshot = selected
     ? { version: 1, title, workout: selected, strength }
     : exampleSnapshot;
+  const isShareManagement = view === "shares";
 
   function navigate(next: View) {
     if (next === view) return;
     if (next === "shares") setSharesLoading(true);
+    if (view === "shares" && next !== "shares") setLoading(true);
     setView(next);
     setMessage("");
     window.history.replaceState(
@@ -145,6 +143,7 @@ export default function Dashboard({ initialView }: { initialView?: string }) {
     window.scrollTo({ top: 0, behavior: "instant" });
   }
   useEffect(() => {
+    if (isShareManagement) return;
     const controller = new AbortController();
     fetch(`/api/dashboard${date ? `?date=${encodeURIComponent(date)}` : ""}`, {
       signal: controller.signal,
@@ -165,11 +164,12 @@ export default function Dashboard({ initialView }: { initialView?: string }) {
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [date, refresh]);
+  }, [date, refresh, isShareManagement]);
   const workoutId = selected?.id;
   const strengthConnected = data?.strengthConnected;
+  const needsStrength = view === "workouts" || view === "library";
   useEffect(() => {
-    if (!workoutId || !strengthConnected) return;
+    if (!workoutId || !strengthConnected || !needsStrength) return;
     const controller = new AbortController();
     fetch(`/api/dashboard/strength?workout=${encodeURIComponent(workoutId)}`, {
       signal: controller.signal,
@@ -190,7 +190,7 @@ export default function Dashboard({ initialView }: { initialView?: string }) {
           });
       });
     return () => controller.abort();
-  }, [workoutId, strengthConnected, refresh]);
+  }, [workoutId, strengthConnected, needsStrength, refresh]);
   useEffect(() => {
     if (view !== "shares") return;
     const controller = new AbortController();
@@ -244,7 +244,7 @@ export default function Dashboard({ initialView }: { initialView?: string }) {
       setMessage(
         configRevision.current === revision
           ? "分享页面已创建，有效期 30 天。"
-          : "已按提交时的设置创建页面，可在「我的分享」查看。",
+          : "已按提交时的设置创建页面，可在「已分享」查看。",
       );
     } catch (reason) {
       setMessage(
@@ -310,7 +310,8 @@ export default function Dashboard({ initialView }: { initialView?: string }) {
     setStrengthResult(null);
     setRefresh((value) => value + 1);
   };
-  const activeView = views.find((item) => item.id === view)!;
+  const navView = view === "shares" ? "library" : view;
+  const activeView = views.find((item) => item.id === navView)!;
   const trainingCount =
     data?.week.filter((day) => day.trained === true).length ?? 0;
   const totalMinutes =
@@ -333,36 +334,19 @@ export default function Dashboard({ initialView }: { initialView?: string }) {
           {views.map((item) => (
             <button
               key={item.id}
-              className={`dash-nav-item ${view === item.id ? "is-active" : ""}`}
-              aria-current={view === item.id ? "page" : undefined}
+              className={`dash-nav-item ${navView === item.id ? "is-active" : ""}`}
+              aria-current={navView === item.id ? "page" : undefined}
               aria-label={item.label}
               title={item.label}
               onClick={() => navigate(item.id)}
             >
               <item.icon size={17} />
               <span>{item.label}</span>
-              {view === item.id ? <span className="dash-nav-dot" /> : null}
+              {navView === item.id ? <span className="dash-nav-dot" /> : null}
             </button>
           ))}
         </nav>
-        <div className="dash-sidebar-note">
-          <span className="dash-sidebar-note-symbol">↗</span>
-          <strong>你的训练，你的表达。</strong>
-          <p>
-            让数据有自己的样子。
-            <br />
-            从一次训练，留下一页记录。
-          </p>
-          <button onClick={() => navigate("library")}>
-            探索分享模板 <ArrowRight size={14} />
-          </button>
-        </div>
         <div className="dash-sidebar-bottom">
-          <Link href="/settings/connections">
-            <Settings2 size={17} />
-            账号与连接
-            <ArrowUpRight size={13} />
-          </Link>
           <div className="dash-account">
             <UserButton />
             <span>
@@ -373,10 +357,7 @@ export default function Dashboard({ initialView }: { initialView?: string }) {
       </aside>
       <div className="dash-main">
         <header className="dash-topbar">
-          <div className="dash-breadcrumb">
-            我的空间 <ChevronRight size={13} />
-            <span>{activeView.label}</span>
-          </div>
+          <div className="dash-breadcrumb">个人工作台</div>
           <div className="dash-topbar-actions">
             <span className="dash-connection">
               <i
@@ -387,6 +368,14 @@ export default function Dashboard({ initialView }: { initialView?: string }) {
                 : "私人工作台"}
             </span>
             <ThemePicker theme={theme} onChange={changeTheme} />
+            <Link
+              href="/settings/connections"
+              className="dash-icon-button"
+              aria-label="账号与连接"
+              title="账号与连接"
+            >
+              <Settings2 size={17} />
+            </Link>
           </div>
         </header>
         <main id="dashboard-content" className="dash-content">
@@ -395,31 +384,17 @@ export default function Dashboard({ initialView }: { initialView?: string }) {
               <span className="dash-overline">
                 {activeView.english.toUpperCase()} / WHOOPER
               </span>
-              <h1>
-                {view === "overview"
-                  ? "每一次训练，都有迹可循。"
-                  : view === "workouts"
-                    ? "把投入，记下来。"
-                    : view === "library"
-                      ? "训练是你的，风格也是。"
-                      : "分享，掌握在你手里。"}
-              </h1>
+              <h1>{activeView.label}</h1>
               <p>
                 {view === "overview"
-                  ? "看见身体的节奏，也留住每一次认真。"
+                  ? "恢复、睡眠与训练负荷，一眼看清。"
                   : view === "workouts"
-                    ? "选择一次训练，查看细节，以自己的方式分享。"
-                    : view === "library"
-                      ? "同一份训练记录，四种不同表达。选一个你喜欢的。"
-                      : "每一个链接都是独立快照，可随时撤销。"}
+                    ? "选择一次训练，查看完整动作记录。"
+                    : "选择呈现方式，或管理已经分享的页面。"}
               </p>
             </div>
-            <span className="dash-page-index">
-              0{views.findIndex((item) => item.id === view) + 1}
-              <small>/ 04</small>
-            </span>
           </div>
-          {error ? (
+          {error && !isShareManagement ? (
             <div className="dash-alert" role="alert">
               <span>{error}</span>
               <button onClick={refreshData}>
@@ -427,10 +402,10 @@ export default function Dashboard({ initialView }: { initialView?: string }) {
               </button>
             </div>
           ) : null}
-          {data?.notice ? (
+          {data?.notice && !isShareManagement ? (
             <p className="dash-data-notice">{data.notice}</p>
           ) : null}
-          {data && data.connectionStatus !== "active" ? (
+          {data && data.connectionStatus !== "active" && !isShareManagement ? (
             <div className="dash-connect-card">
               <span className="dash-connect-icon">
                 <Activity size={28} />
@@ -449,13 +424,14 @@ export default function Dashboard({ initialView }: { initialView?: string }) {
             </div>
           ) : null}
 
-          {view === "overview" || view === "workouts" ? (
+          {(view === "overview" || view === "workouts") &&
+          (loading || data?.connectionStatus === "active") ? (
             <>
               <div className="dash-date-row">
                 <span>
-                  {data?.date
-                    ? `${data.date.replaceAll("-", ".")} · ${data.timezone}`
-                    : "YOUR DAILY CONTEXT"}
+                  {data?.timezone
+                    ? `按 ${data.timezone} 统计`
+                    : "正在读取训练数据"}
                 </span>
                 <div>
                   <label className="dash-date-input">
@@ -522,7 +498,7 @@ export default function Dashboard({ initialView }: { initialView?: string }) {
                     />
                     <Metric
                       icon={Clock3}
-                      label="本周训练时长"
+                      label="近七天训练时长"
                       value={number(totalMinutes)}
                       unit="min"
                       caption="LAST 7 DAYS"
@@ -602,43 +578,6 @@ export default function Dashboard({ initialView }: { initialView?: string }) {
                         </span>
                       </div>
                     </section>
-                    <section className="dash-panel dash-feature-template">
-                      <div className="dash-panel-heading">
-                        <span className="dash-overline">
-                          YOUR EFFORT, YOUR EXPRESSION
-                        </span>
-                        <ArrowUpRight size={18} />
-                      </div>
-                      <div className="dash-mini-sheet" aria-hidden="true">
-                        <span>PERSONAL TRAINING RECORD</span>
-                        <strong>Exercise List</strong>
-                        <div>
-                          <span>EXERCISE</span>
-                          <span>SETS</span>
-                          <span>REPS</span>
-                        </div>
-                        {["Pull up", "Seated row", "Lat pulldown"].map(
-                          (name, i) => (
-                            <div key={name}>
-                              <i>{name}</i>
-                              <i>3</i>
-                              <i>{8 + i * 2}</i>
-                            </div>
-                          ),
-                        )}
-                        <small>EVERY REP COUNTS.</small>
-                      </div>
-                      <div className="dash-feature-copy">
-                        <h2>让记录，成为作品。</h2>
-                        <p>手写训练单、动作图鉴，还有更多。</p>
-                        <button
-                          className="dash-text-button"
-                          onClick={() => navigate("library")}
-                        >
-                          打开分享页面库 <ArrowRight size={15} />
-                        </button>
-                      </div>
-                    </section>
                   </div>
                 </>
               ) : null}
@@ -647,7 +586,10 @@ export default function Dashboard({ initialView }: { initialView?: string }) {
                   <div>
                     <span className="dash-overline">THE WORK YOU PUT IN</span>
                     <h2>
-                      训练记录<span>{data?.workouts.length ?? 0}</span>
+                      {view === "overview" ? "最近训练" : "训练记录"}
+                      {view === "workouts" ? (
+                        <span>{data?.workouts.length ?? 0}</span>
+                      ) : null}
                     </h2>
                   </div>
                   {view === "overview" ? (
@@ -655,7 +597,7 @@ export default function Dashboard({ initialView }: { initialView?: string }) {
                       className="dash-text-button"
                       onClick={() => navigate("workouts")}
                     >
-                      查看全部 <ArrowUpRight size={14} />
+                      查看近七天训练 <ArrowUpRight size={14} />
                     </button>
                   ) : (
                     <span className="dash-muted">选择训练以查看详情</span>
@@ -683,13 +625,25 @@ export default function Dashboard({ initialView }: { initialView?: string }) {
                     </Link>
                   </div>
                 ) : (
-                  <div className="dash-workout-list">
-                    {data.workouts.map((workout) => (
+                  <div
+                    className={`dash-workout-list ${view === "overview" ? "is-compact" : ""}`}
+                  >
+                    {(view === "overview"
+                      ? data.workouts.slice(0, 3)
+                      : data.workouts
+                    ).map((workout) => (
                       <button
                         key={workout.id}
-                        className={`dash-workout-row ${selected?.id === workout.id ? "is-selected" : ""}`}
-                        onClick={() => pickWorkout(workout.id)}
-                        aria-pressed={selected?.id === workout.id}
+                        className={`dash-workout-row ${view === "workouts" && selected?.id === workout.id ? "is-selected" : ""}`}
+                        onClick={() => {
+                          pickWorkout(workout.id);
+                          if (view === "overview") navigate("workouts");
+                        }}
+                        aria-pressed={
+                          view === "workouts"
+                            ? selected?.id === workout.id
+                            : undefined
+                        }
                       >
                         <span className="dash-workout-icon">
                           {/run|跑|walk|步|cycl|骑/i.test(workout.name) ? (
@@ -724,26 +678,30 @@ export default function Dashboard({ initialView }: { initialView?: string }) {
                           <span>运动负荷</span>
                         </span>
                         <span className="dash-workout-arrow">
-                          <ArrowDownLeft size={17} />
+                          {view === "overview" ? (
+                            <ArrowUpRight size={17} />
+                          ) : (
+                            <ArrowDownLeft size={17} />
+                          )}
                         </span>
                       </button>
                     ))}
                   </div>
                 )}
               </section>
-              {selected ? (
+              {view === "workouts" && selected ? (
                 <section className="dash-session-section">
                   <div className="dash-section-heading">
                     <div>
                       <span className="dash-overline">A CLOSER LOOK</span>
-                      <h2>这一次训练</h2>
+                      <h2>{selected.name}</h2>
                     </div>
                     <button
                       className="dash-button"
                       onClick={() => navigate("library")}
                     >
                       <Share2 size={14} />
-                      选择分享样式
+                      分享这次训练
                     </button>
                   </div>
                   {strengthLoading ? (
@@ -778,203 +736,209 @@ export default function Dashboard({ initialView }: { initialView?: string }) {
             </>
           ) : null}
 
+          {view === "library" || view === "shares" ? (
+            <nav className="dash-studio-tabs" aria-label="分享工作室">
+              <button
+                aria-current={view === "library" ? "page" : undefined}
+                onClick={() => navigate("library")}
+              >
+                <Sparkles size={15} />
+                创建页面
+              </button>
+              <button
+                aria-current={view === "shares" ? "page" : undefined}
+                onClick={() => navigate("shares")}
+              >
+                <Link2 size={15} />
+                已分享
+              </button>
+            </nav>
+          ) : null}
           {view === "library" ? (
-            <>
-              <div className="dash-library-toolbar">
-                <span>
-                  <span className="dash-count">04</span>种表达方式{" "}
-                  <span className="dash-library-divider">/</span>{" "}
-                  同步你的训练数据
-                </span>
-                <span className="dash-chip">
-                  <ShieldCheck size={12} />
-                  创建前仅自己可见
-                </span>
-              </div>
-              <section className="dash-template-grid" aria-label="分享页面模板">
-                {TEMPLATES.map((item) => (
-                  <button
-                    className={`dash-template-card ${template === item.id ? "is-selected" : ""}`}
-                    key={item.id}
-                    aria-pressed={template === item.id}
-                    onClick={() => {
-                      setTemplate(item.id);
+            <section className="dash-studio">
+              <div className="dash-studio-settings">
+                <label>
+                  训练记录
+                  <select
+                    value={selected?.id ?? ""}
+                    onChange={(event) => pickWorkout(event.target.value)}
+                    disabled={!data?.workouts.length}
+                  >
+                    <option value="" disabled>
+                      {loading ? "正在读取…" : "暂无可分享训练"}
+                    </option>
+                    {data?.workouts.map((workout) => (
+                      <option key={workout.id} value={workout.id}>
+                        {workout.date} · {workout.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  页面标题
+                  <input
+                    maxLength={80}
+                    value={title}
+                    onChange={(event) => {
+                      setTitle(event.target.value);
                       invalidateShare();
                     }}
-                  >
-                    <div className="dash-template-thumbnail">
-                      <WorkoutPresentation
-                        snapshot={snapshot}
-                        template={item.id}
-                        compact
-                      />
-                      <span className="dash-template-number">
-                        {item.number}
-                      </span>
-                    </div>
-                    <div className="dash-template-card-copy">
-                      <span className="dash-template-category">
-                        {item.category}
-                      </span>
-                      <h2>
-                        {item.name}
-                        {template === item.id ? (
-                          <Check size={18} />
-                        ) : (
-                          <ArrowUpRight size={18} />
-                        )}
-                      </h2>
-                      <p>{item.description}</p>
-                    </div>
-                  </button>
-                ))}
-              </section>
-              <section className="dash-studio">
-                <div className="dash-studio-settings">
-                  <span className="dash-overline">MAKE A PAGE OF YOUR OWN</span>
-                  <h2>留下你的这一页。</h2>
-                  <p>选择训练和外观，生成一个可分享的只读页面。</p>
-                  <label>
-                    训练记录
-                    <select
-                      value={selected?.id ?? ""}
-                      onChange={(event) => pickWorkout(event.target.value)}
-                      disabled={!data?.workouts.length}
-                    >
-                      <option value="" disabled>
-                        {loading ? "正在读取…" : "暂无可分享训练"}
-                      </option>
-                      {data?.workouts.map((workout) => (
-                        <option key={workout.id} value={workout.id}>
-                          {workout.date} · {workout.name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label>
-                    页面标题
-                    <input
-                      maxLength={80}
-                      value={title}
-                      onChange={(event) => {
-                        setTitle(event.target.value);
+                    placeholder="给这次训练起个标题"
+                  />
+                </label>
+                <fieldset className="dash-template-options">
+                  <legend>页面模板</legend>
+                  {TEMPLATES.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      className={`dash-template-option ${template === item.id ? "is-selected" : ""}`}
+                      aria-pressed={template === item.id}
+                      onClick={() => {
+                        setTemplate(item.id);
                         invalidateShare();
                       }}
-                      placeholder="给这次训练起个标题"
-                    />
-                  </label>
-                  <div className="dash-share-summary">
-                    <span>
-                      模板
-                      <strong>
-                        {TEMPLATES.find((item) => item.id === template)?.name}
-                      </strong>
-                    </span>
-                    <span>
-                      外观
-                      <ThemePicker theme={theme} onChange={changeTheme} />
-                    </span>
-                  </div>
-                  <div className="dash-share-privacy">
-                    <ShieldCheck size={17} />
-                    <p>
-                      仅分享本次训练及动作记录。恢复、睡眠、心率和账号资料留在你的私人空间。链接
-                      30 天后失效，也可随时撤销。
-                    </p>
-                  </div>
-                  <button
-                    className="dash-button dash-create-button"
-                    onClick={createShare}
-                    disabled={
-                      !selected ||
-                      loading ||
-                      creating ||
-                      strengthLoading ||
-                      !!strengthError ||
-                      !title.trim()
+                    >
+                      <span className="dash-template-option-number">
+                        {item.number}
+                      </span>
+                      <span>
+                        <strong>{item.name}</strong>
+                        <small>{item.category}</small>
+                      </span>
+                      {template === item.id ? <Check size={15} /> : null}
+                    </button>
+                  ))}
+                  <p className="dash-template-description">
+                    {
+                      TEMPLATES.find((item) => item.id === template)
+                        ?.description
                     }
-                  >
-                    {creating || strengthLoading ? (
-                      <LoaderCircle size={16} className="dash-spin" />
-                    ) : (
-                      <Share2 size={16} />
-                    )}
-                    {creating
-                      ? "正在生成页面…"
-                      : strengthLoading
-                        ? "正在读取训练…"
-                        : "创建分享页面"}
-                    <ArrowUpRight size={16} />
-                  </button>
-                  {!selected ? (
-                    <p className="dash-preview-note">
-                      模板使用示例数据预览。连接 WHOOP
-                      并选择真实训练后可创建分享。
-                    </p>
-                  ) : null}
-                  {strengthError ? (
-                    <p className="dash-preview-note" role="status">
-                      训练明细读取失败，请返回训练记录重试。
-                    </p>
-                  ) : null}
-                  <p className="dash-action-message" role="status">
-                    {message}
                   </p>
-                  {createdUrl ? (
-                    <div className="dash-created-link">
-                      <input
-                        aria-label="已生成的分享链接"
-                        readOnly
-                        value={createdUrl}
-                        onFocus={(event) => event.target.select()}
-                      />
-                      <div>
-                        <button
-                          className="dash-text-button"
-                          onClick={() => copy(createdUrl)}
-                        >
-                          {copied === createdUrl ? (
-                            <Check size={14} />
-                          ) : (
-                            <Copy size={14} />
-                          )}
-                          {copied === createdUrl ? "已复制" : "复制链接"}
-                        </button>
-                        <a
-                          className="dash-text-button"
-                          href={createdUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          打开页面 <ExternalLink size={14} />
-                        </a>
-                      </div>
-                    </div>
-                  ) : null}
+                </fieldset>
+                <div className="dash-share-privacy">
+                  <ShieldCheck size={17} />
+                  <p>
+                    仅分享这次训练。链接 30 天有效，可随时在「已分享」撤销。
+                  </p>
                 </div>
-                <div className="dash-studio-preview">
-                  <div className="dash-preview-heading">
-                    <span>
-                      {selected ? "你的分享页面预览" : "模板预览 · 示例数据"}
-                    </span>
+                <button
+                  className="dash-button dash-create-button"
+                  onClick={createShare}
+                  disabled={
+                    !selected ||
+                    loading ||
+                    creating ||
+                    strengthLoading ||
+                    !!strengthError ||
+                    !title.trim()
+                  }
+                >
+                  {creating || strengthLoading ? (
+                    <LoaderCircle size={16} className="dash-spin" />
+                  ) : (
+                    <Share2 size={16} />
+                  )}
+                  {creating
+                    ? "正在生成页面…"
+                    : strengthLoading
+                      ? "正在读取训练…"
+                      : "创建分享页面"}
+                  <ArrowUpRight size={16} />
+                </button>
+                {!selected ? (
+                  <p className="dash-preview-note">
+                    模板使用示例数据预览。连接 WHOOP
+                    并选择真实训练后可创建分享。
+                  </p>
+                ) : null}
+                {strengthError ? (
+                  <p className="dash-preview-note" role="status">
+                    训练明细读取失败，请在训练记录中重新读取。
+                  </p>
+                ) : null}
+                <p className="dash-action-message" role="status">
+                  {message}
+                </p>
+                {createdUrl ? (
+                  <div className="dash-created-link">
+                    <input
+                      aria-label="已生成的分享链接"
+                      readOnly
+                      value={createdUrl}
+                      onFocus={(event) => event.target.select()}
+                    />
+                    <div>
+                      <button
+                        className="dash-text-button"
+                        onClick={() => copy(createdUrl)}
+                      >
+                        {copied === createdUrl ? (
+                          <Check size={14} />
+                        ) : (
+                          <Copy size={14} />
+                        )}
+                        {copied === createdUrl ? "已复制" : "复制链接"}
+                      </button>
+                      <a
+                        className="dash-text-button"
+                        href={createdUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        打开页面 <ExternalLink size={14} />
+                      </a>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+              <div className="dash-studio-preview">
+                <div className="dash-preview-heading">
+                  <span>
+                    {loading
+                      ? "正在读取训练…"
+                      : selected
+                        ? "页面预览"
+                        : "示例数据 · 连接 WHOOP 后可分享自己的训练"}
+                  </span>
+                  {selected &&
+                  (template === "ledger" || template === "illustrated") ? (
                     <button
                       className="dash-text-button"
-                      onClick={() => preview.current?.showModal()}
+                      onClick={saveImage}
+                      disabled={
+                        exporting ||
+                        loading ||
+                        strengthLoading ||
+                        !!strengthError
+                      }
                     >
-                      展开预览 <ArrowUpRight size={13} />
+                      {exporting ? (
+                        <LoaderCircle size={14} className="dash-spin" />
+                      ) : (
+                        <Download size={14} />
+                      )}
+                      {exporting ? "导出中…" : "保存 PNG"}
                     </button>
-                  </div>
+                  ) : null}
+                </div>
+                <div ref={exportContent}>
                   <WorkoutPresentation
                     snapshot={snapshot}
                     template={template}
                   />
                 </div>
-              </section>
-            </>
+              </div>
+            </section>
           ) : null}
 
           {view === "shares" ? (
             <section className="dash-shares-section">
+              {message ? (
+                <p className="dash-action-message" role="status">
+                  {message}
+                </p>
+              ) : null}
               {sharesError ? (
                 <div role="alert" className="dash-alert">
                   <span>{sharesError}</span>
@@ -1002,7 +966,7 @@ export default function Dashboard({ initialView }: { initialView?: string }) {
                     className="dash-button"
                     onClick={() => navigate("library")}
                   >
-                    探索分享页面库 <ArrowRight size={16} />
+                    创建第一个分享页面 <ArrowRight size={16} />
                   </button>
                 </div>
               ) : (
@@ -1089,45 +1053,6 @@ export default function Dashboard({ initialView }: { initialView?: string }) {
           </footer>
         </main>
       </div>
-      <dialog
-        ref={preview}
-        className="dash-full-preview"
-        aria-label="分享页面完整预览"
-      >
-        <div className="dash-full-preview-toolbar">
-          <span>{selected ? "分享页面预览" : "示例数据 · 模板预览"}</span>
-          <div className="dash-preview-actions">
-            {selected &&
-            (template === "ledger" || template === "illustrated") ? (
-              <button
-                className="dash-text-button"
-                onClick={saveImage}
-                disabled={exporting || loading || strengthLoading}
-              >
-                {exporting ? (
-                  <LoaderCircle size={14} className="dash-spin" />
-                ) : (
-                  <Download size={14} />
-                )}
-                {exporting ? "导出中…" : "保存 PNG"}
-              </button>
-            ) : null}
-            <button
-              className="dash-icon-button"
-              aria-label="关闭预览"
-              onClick={() => preview.current?.close()}
-            >
-              <X size={20} />
-            </button>
-          </div>
-        </div>
-        <p className="dash-action-message" role="status">
-          {message}
-        </p>
-        <div ref={exportContent}>
-          <WorkoutPresentation snapshot={snapshot} template={template} />
-        </div>
-      </dialog>
     </div>
   );
 }
